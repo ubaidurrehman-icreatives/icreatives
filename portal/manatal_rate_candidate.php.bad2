@@ -1,0 +1,1540 @@
+<?php
+ session_start();
+ ini_set('display_errors', 1);
+ ini_set('display_startup_errors', 1);
+ error_reporting(E_ALL);
+ $contactID = $_SESSION['contactID'];
+ use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+use PHPMailer\PHPMailer\SMTP;
+use GuzzleHttp\Exception\ClientException;
+
+session_start();
+
+require_once  dirname(__DIR__) . '/vendor/autoload.php';
+require_once  dirname(__DIR__) . '/db/token.php';
+require_once __DIR__ . '/../db/db.php';
+$link = db();  
+
+include './portal/manatal_verify.php';
+
+
+$query = "SELECT  m.candidate,
+                  m.job,
+                  m.reviewed,
+                  m.rating,
+                  m.id,
+                  m.declined,
+                  m.schedule_interview,
+                  m.interview_time,
+                  m.candidate_name,
+                  m.created_at,
+				  m.bill_rate,
+				  m.salary
+          FROM ic_matches m
+          WHERE m.job = '".$_REQUEST['o']."' AND m.share = '1'  
+          ORDER BY m.declined ASC, m.reviewed, m.schedule_interview ASC, m.created_at DESC";
+		  // , candidates.weight DESC";
+
+$result = mysqli_query($link,$query );
+$_SESSION['candidates'] = [];
+$candidates = [];
+
+while($row = mysqli_fetch_array($result)) { // retrieve each candidate's info
+ 
+
+ array_push($_SESSION['candidates'], array('candidate_id' => $row['candidate'], 'submital' => $row['id'], 'assignment_id' => $row['job']));
+  $timestamp = strtotime($row['created_at']);
+  $candidates[$row['candidate']]['date_received'] = date('d F, Y', $timestamp);
+  $candidates[$row['candidate']]['submital'] = htmlspecialchars($row['id']);
+  list($first_name,$lastname) = explode(" ",$row['candidate_name']);
+  $candidates[$row['candidate']]['name'] = htmlspecialchars($first_name);
+  $candidates[$row['candidate']]['bill'] = sprintf('$%.2f',htmlspecialchars($row['bill_rate']));
+  $candidates[$row['candidate']]['salary'] = htmlspecialchars($row['salary']);
+  $candidates[$row['candidate']]['reviewed'] = htmlspecialchars($row['reviewed']);
+  $candidates[$row['candidate']]['rating'] = htmlspecialchars($row['rating']);
+  if($row['schedule_interview']) {
+    $candidates[$row['candidate']]['interview'] = $row['interview_time'] == "0000-00-00 00:00:00"  ? "ASAP" : date('d F, Y', strtotime($row['interview_time']));
+  } else {
+    $candidates[$row['candidate']]['interview'] = is_null($row['declined']) || !$row['declined'] ? "" : "Declined";
+  }
+}
+
+
+if(!isset($_SESSION['candidates'])) { // candidates not set
+  if(isset($_REQUEST['o'])) {
+    header("Location: /view-order?o=".$_REQUEST['o']);
+    exit;
+  } else {
+    header("Location: /dashboard");
+    exit;
+  }
+}
+
+function userInfo($data, $field, $targetDisplayName) {
+
+    foreach ($data['results'] as $entry) {
+        if (isset($entry[$field]) && $entry[$field] == $targetDisplayName) {
+            // Found the entry with the target display_name
+            // Access other information if needed
+            $id = $entry['id'];
+            $email = $entry['email'];
+            // ... other fields
+
+            return $entry; // Return the entry
+        }
+    }
+
+    return null; // Return null if not found
+}
+
+
+// find all user data
+
+
+	$client = new \GuzzleHttp\Client([ 'timeout' => 30, 'connect_timeout' => 10]);
+
+
+
+try {
+$response = $client->request('GET', 'https://api.manatal.com/open/v3/users/', [
+  'headers' => [
+ 		'Authorization' => $token,
+    'accept' => 'application/json',
+  ],
+]);
+
+	$response->getBody();
+	$responseStr = $response->getBody();
+	$users = json_decode($responseStr, true);
+}catch (\GuzzleHttp\Exception\ClientException $e) {
+    $statusCode = $e->getResponse()->getStatusCode();
+
+    $body = (string) $e->getResponse()->getBody();
+    $json = json_decode($body, true);
+
+    // Default wait time
+    $wait = 60;
+
+    if (isset($json['detail']) && preg_match('/available in (\d+) seconds/', $json['detail'], $matches)) {
+        $wait = $matches[1];
+    }
+
+    echo "<p>The server is busy. Please wait {$wait} seconds. The page will reload automatically. (id)</p>";
+    echo "<script>setTimeout(() => { location.reload(); }, " . ($wait * 1000) . ");</script>";
+
+    exit();
+}
+
+
+// retrieve client/contact's information
+// $employee = htmlspecialchars($_SESSION['candidates'][$_REQUEST['cand']]['employee_id']);
+$candidateID = htmlspecialchars($_SESSION['candidates'][$_REQUEST['cand']]['candidate_id']);
+$submital = htmlspecialchars($_SESSION['candidates'][$_REQUEST['cand']]['submital']);
+$assignmentID = htmlspecialchars($_SESSION['candidates'][$_REQUEST['cand']]['assignment_id']);
+$order = htmlspecialchars($_REQUEST['o']);
+// $divisionID = $_SESSION['division'];
+$contactID = $_SESSION['contactID'];
+$customerID = $_SESSION['customer'];
+$match_id = $submital;
+// Chat helped me with this so it only sends email if contact did not visit today already
+/*
+if(!isset($_SESSION['recruiter_id'])) {
+	// if first view
+	$query = "SELECT 1 FROM ic_candidate_views WHERE contact_id = '".$contactID."' AND candidate_id = '".$candidateID."' AND order_id = '".$order."'";
+	$result = mysqli_query($link,$query );
+
+  require_once("./portal/PHPMailer/PHPMailer.php");
+  require_once("./portal/PHPMailer/Exception.php");
+  require_once("./portal/PHPMailer/SMTP.php");
+  
+  // 2025-06-22 added $_SESSION['recruiter_id'] again below sjc;
+  
+  if(mysqli_num_rows($result) == 0  && !isset($_SESSION['recruiter_id'])) {
+
+	$query = "UPDATE ic_matches SET first_viewed_date = NOW(),  last_viewed_date = NOW(), reviewed = true, view_count = view_count + 1 WHERE id = '".$match_id."'";
+	$result = mysqli_query($link,$query );
+
+    // Get contact's information
+    $query = "SELECT  m.candidate_name,
+                      m.company_name,
+					  m.job_name,
+					  m.job,
+					  m.owner,
+					  m.owner_1_name,
+					  m.owner_2_name,
+					  m.owner_3_name,
+					  m.view_count
+              FROM ic_matches m
+              WHERE m.job = '".$order."' AND m.candidate = '".$candidateID."'";
+
+	$result = mysqli_query($link,$query);
+	$row = mysqli_fetch_array($result);
+
+	// $contact_name = $row['First_Name']." ".$row['Last_Name'];
+    // $division_name = $row['Division_Name'];
+    $customer_name = $row['company_name'];
+    $view_count = $row['view_count'];
+	$contact_email = $_SESSION['user_id'];
+	$candidate_name = $row['candidate_name'];
+	
+	// list($owner_1_first,$owner_1_last) = explode("-",$row['owner_1_name'];
+	// list($owner_2_first,$owner_2_last) = explode("-",$row['owner_2_name'];
+	// list($owner_3_first,$owner_3_last) = explode("-",$row['owner_3_name'];
+	// $owner_1_email = $owner_1_first.substr($owner_1_last,0,1)."@icreatives.com";
+	// $owner_2_email = $owner_2_first.substr($owner_2_last,0,1)."@icreatives.com";
+	// $owner_3_email = $owner_3_first.substr($owner_3_last,0,1)."@icreatives.com";
+	
+	 $result = userInfo($users,"display_name",$row['owner_1_name']);
+	 $owner_1_email = $result['email'];
+	 $result = userInfo($users,"display_name",$row['owner_2_name']);
+	 $owner_2_email = $result['email'];
+	 $result = userInfo($users,"display_name",$row['owner_3_name']);
+	 $owner_3_email = $result['email'];
+	 
+	 if(empty($owner_1_email)) {
+		$result = userInfo($users,"id",$row['owner']);
+		$owner_1_email = $result['email'];
+	 }
+
+    $mail = new PHPMailer(true);
+    try {
+      // Server settings
+      // $mail->SMTPDebug = 3;
+      $mail->isSMTP();
+      $mail->Host = 'smtp.1and1.com';
+      $mail->SMTPAuth = true;
+      $mail->Username = 'exchange@icreatives.com';
+      $mail->Password = 'Call1888icreate!';
+		
+		$mail->SMTPSecure = 'tls';         // Enable TLS encryption; `  PHPMailer::ENCRYPTION_SMTPS` encouraged
+		$mail->Port       = 587;                                    // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
+
+      // Recipients
+      $mail->setFrom('no-reply@icreatives.com','icreatives');
+	  if(isset($owner_1_email) && $owner_1_email !==""){$mail->addAddress($owner_1_email);}
+	  if(isset($owner_2_email) && $owner_2_email !==""){$mail->addAddress($owner_2_email);}
+	  if(isset($owner_3_email) && $owner_3_email !==""){$mail->addAddress($owner_3_email);}
+	  
+	  
+      $mail->addBCC('jobcomp2@blindemail.com');
+      $mail->addBCC('stevenc@icreatives.com');
+
+      // Content 
+	  $ip_address = $_SERVER['REMOTE_ADDR'];
+      $mail->Subject = "icreatives - Reeling 'em in!";
+      $mail_message = "
+      <html>
+      <body>
+      <p>`$candidate_name` was viewed by <a href='https://app.manatal.com/contacts/`$contactID`?tab=info'>`$contact_email` </a>from <a href='https://app.manatal.com/clients/`$customerID`?tab=jobs'>`$customer_name`</a>:</p>
+      <ul>
+        <li>Employee ID: <a href='https://app.manatal.com/candidates/`$candidateID`?tab=more'>`$candidateID`</a></li>
+        <li>Viewer's Email: `$contact_email`</li>
+        <li>Viewer's Contact ID: <a href='https://app.manatal.com/contacts/`$contactID`?tab=info'>`$contactID`</a></li>
+        <li>Order ID: <a href='https://app.manatal.com/jobs/`$order`?tab=candidates'>`$order`</a></li>
+		<li>IP : `$ip_address`</li>
+      </ul>
+      </body>
+      </html>";
+      $mail->MsgHTML($mail_message);
+      $mail->send();
+
+    } catch (Exception $e) {
+      echo "The server is busy, please try again.";
+	  	exit();
+      return;
+    }
+
+  // Add history event to match notes
+	$mail_message = preg_replace('/[^a-zA-Z0-9_\-#;:&()<> ]/', '', $mail_message);
+	$mail_message = addslashes($mail_message);
+	$response = $client->request('POST', 'https://api.manatal.com/open/v3/matches/'.$match_id.'/notes/', [
+    'body' => '{"info":"'.$mail_message.'"}',
+    'headers' => [
+      'Authorization' => 'Token 92e3967b096dc33e0f09df8c0a927ec0437d8942',
+      'accept' => 'application/json',
+      'content-type' => 'application/json',
+		],
+	]);
+
+
+  } else {
+	$query = "UPDATE ic_matches SET first_viewed_date = NOW(),  last_viewed_date = NOW(), reviewed = true, view_count = view_count + 1 WHERE id = '".$match_id."'";
+	$result = mysqli_query($link,$query );
+  }
+
+  // log contact's information to candidate views
+  $ip = $_SERVER['REMOTE_ADDR'];
+	$query = "INSERT INTO ic_candidate_views(candidate_id, contact_id, order_id, viewed_at, ip_address) VALUES ('".$candidateID."','".$contactID."', '".$order."',NOW(),'".$ip."')";
+
+	$result = mysqli_query($link,$query );
+}
+*/
+// end
+
+// New code
+if (!isset($_SESSION['recruiter_id'])) {
+    // Check if the contact has *ever* viewed this candidate
+    $query = "SELECT 1 FROM ic_candidate_views 
+              WHERE contact_id = '".$contactID."' 
+                AND candidate_id = '".$candidateID."' 
+                AND order_id = '".$order."'";
+    $result = mysqli_query($link, $query);
+
+    // Check if the contact has viewed the candidate *today*
+	$query_today = "SELECT 1 FROM ic_candidate_views 
+		WHERE contact_id = '".$contactID."' 
+		AND candidate_id = '".$candidateID."' 
+		AND order_id = '".$order."'
+		AND DATE(viewed_at) = CURDATE()";
+
+	$result_today = mysqli_query($link, $query_today);
+	$alreadyViewedToday = mysqli_num_rows($result_today) > 0;
+
+    $result_today = mysqli_query($link, $query_today);
+    $alreadyViewedToday = mysqli_num_rows($result_today) > 0;
+
+    // Always update the match and log the view
+	$query = "UPDATE ic_matches 
+          SET 
+            last_viewed_date = NOW(), 
+            reviewed = true, 
+            view_count = view_count + 1,
+            first_viewed_date = IF(first_viewed_date IS NULL, NOW(), first_viewed_date)
+          WHERE id = '{$match_id}'";
+
+    $result = mysqli_query($link, $query);
+
+    $ip = $_SERVER['REMOTE_ADDR'];
+    $query = "INSERT INTO ic_candidate_views(candidate_id, contact_id, order_id, viewed_at, ip_address) 
+              VALUES ('".$candidateID."','".$contactID."', '".$order."', NOW(), '".$ip."')";
+    $result = mysqli_query($link, $query);
+
+    // Only send email if NOT viewed today and NOT a recruiter
+		
+		if (!$alreadyViewedToday) {
+			$query = "UPDATE ic_matches 
+			SET 
+				last_viewed_date = NOW(), 
+				reviewed = true, 
+				view_count = view_count + 1,
+				first_viewed_date = IF(first_viewed_date IS NULL, NOW(), first_viewed_date)
+				WHERE id = '{$match_id}'";
+			mysqli_query($link, $query);
+
+        require_once("./portal/PHPMailer/PHPMailer.php");
+        require_once("./portal/PHPMailer/Exception.php");
+        require_once("./portal/PHPMailer/SMTP.php");
+
+        // Get contact's information for the email
+        $query = "SELECT  m.candidate_name,
+                          m.company_name,
+                          m.job_name,
+                          m.job,
+                          m.owner,
+                          m.owner_1_name,
+                          m.owner_2_name,
+                          m.owner_3_name,
+                          m.view_count
+                  FROM ic_matches m
+                  WHERE m.job = '".$order."' AND m.candidate = '".$candidateID."'";
+        $result = mysqli_query($link, $query);
+        $row = mysqli_fetch_array($result);
+
+        $customer_name = $row['company_name'];
+        $view_count = $row['view_count'];
+        $contact_email = $_SESSION['user_id'];
+        $candidate_name = $row['candidate_name'];
+
+        // Get recruiter email addresses from Manatal API
+        $result = userInfo($users, "display_name", $row['owner_1_name']);
+        $owner_1_email = $result['email'];
+        $result = userInfo($users, "display_name", $row['owner_2_name']);
+        $owner_2_email = $result['email'];
+        $result = userInfo($users, "display_name", $row['owner_3_name']);
+        $owner_3_email = $result['email'];
+
+        if (empty($owner_1_email)) {
+            $result = userInfo($users, "id", $row['owner']);
+            $owner_1_email = $result['email'];
+        }
+
+        $mail = new PHPMailer(true);
+        try {
+            $mail->isSMTP();
+            $mail->Host = 'smtp.1and1.com';
+            $mail->SMTPAuth = true;
+            $mail->Username = 'exchange@icreatives.com';
+            $mail->Password = 'Call1888icreate!';
+            $mail->SMTPSecure = 'tls';
+            $mail->Port = 587;
+
+            $mail->setFrom('no-reply@icreatives.com','icreatives');
+            if (!empty($owner_1_email)) $mail->addAddress($owner_1_email);
+            if (!empty($owner_2_email)) $mail->addAddress($owner_2_email);
+            if (!empty($owner_3_email)) $mail->addAddress($owner_3_email);
+
+            $mail->addBCC('jobcomp2@blindemail.com');
+            $mail->addBCC('stevenc@icreatives.com');
+
+            $ip_address = $_SERVER['REMOTE_ADDR'];
+            $mail->Subject = "icreatives - Reeling 'em in!";
+            $mail_message = "
+              <html><body>
+              <p><b>{$candidate_name}</b> was viewed by 
+              <a href='https://app.manatal.com/contacts/{$contactID}?tab=info'>{$contact_email}</a> 
+              from <a href='https://app.manatal.com/clients/{$customerID}?tab=jobs'>{$customer_name}</a>:</p>
+              <ul>
+                <li>Employee ID: <a href='https://app.manatal.com/candidates/{$candidateID}?tab=more'>{$candidateID}</a></li>
+                <li>Viewer's Email: {$contact_email}</li>
+                <li>Viewer's Contact ID: <a href='https://app.manatal.com/contacts/{$contactID}?tab=info'>{$contactID}</a></li>
+                <li>Order ID: <a href='https://app.manatal.com/jobs/{$order}?tab=candidates'>{$order}</a></li>
+                <li>IP : {$ip_address}</li>
+              </ul>
+              </body></html>";
+
+            $mail->MsgHTML($mail_message);
+            $mail->send();
+
+            // Add history note to match
+            $mail_message = preg_replace('/[^a-zA-Z0-9_\-#;:&()<> ]/', '', $mail_message);
+            $mail_message = addslashes($mail_message);
+            $response = $client->request('POST', 'https://api.manatal.com/open/v3/matches/'.$match_id.'/notes/', [
+                'body' => '{"info":"'.$mail_message.'"}',
+                'headers' => [
+                    'Authorization' => 'Token 92e3967b096dc33e0f09df8c0a927ec0437d8942',
+                    'accept' => 'application/json',
+                    'content-type' => 'application/json',
+                ],
+            ]);
+
+        } catch (Exception $e) {
+            echo "The server is busy, please try again.";
+            exit();
+        }
+    }
+}
+
+// end new code
+
+// select candidate with employee_id in the submital
+$query = "SELECT  m.rating,
+                  m.notes,
+                  m.customer_comments,
+				  m.interview_comments,
+                  m.interview_time,
+                  m.schedule_interview,
+                  m.DisplayCustomResume,
+                  m.declined,
+                  m.declined_comments,
+                  m.expires_at,
+                  m.alternate_date_1,
+                  m.alternate_date_2,
+                  m.alternate_date_3,
+                  m.created_at,
+                  m.job_name,
+                  m.bill_rate,
+		          m.salary,
+                  m.candidate_name,
+                  m.candidate_email
+          FROM ic_matches m
+          WHERE m.candidate = '".$candidateID."' AND m.job = '".$order."'" ;
+$result = mysqli_query($link,$query);
+
+if(mysqli_num_rows($result) == 0) {
+  echo "No Applicants";
+  return;
+}
+
+$row = mysqli_fetch_array($result);
+
+//retrieve candidate information
+$rating = htmlspecialchars(is_null($row['rating']) ? 0 : $row['rating']);
+$position = htmlspecialchars($row['job_name']);
+$rate = sprintf('$%.2f',htmlspecialchars($row['bill_rate']));
+$salary = htmlspecialchars($row['salary']);
+$comments = htmlspecialchars($row['customer_comments']);
+$customer_comments = htmlspecialchars($row['customer_comments']);
+
+$declined = (is_null($row['declined']) || $row['declined'] == 0) ? false : true;
+$declined_comments = htmlspecialchars($row['declined_comments']);
+
+// check if candidate has expired
+$submital_date = $row['creation_date'];
+$invalid_resume_date = $row['expires_at'];
+$is_valid = is_null($invalid_resume_date) ? true : strtotime($submital_date) < strtotime($invalid_resume_date);
+$customResume = $row['DisplayCustomResume'];
+
+$recruiter_name = htmlspecialchars($row['candidate_name']." ".$row['recruiter_last_name']);
+$recruiter_email = htmlspecialchars($row['recruiter_email']);
+$time_set = !is_null($row['interview_time']);
+if( $row['interview_time'] == "0000-00-00 00:00:00") {
+	$time_set = 0;
+} else {
+	$time_set = 1;
+}
+// $time_set = !is_null($row['interview_time']);
+
+
+$time = $row['interview_time'] = "0000-00-00 00:00:00" ? date('F, d Y H:i') : date('F, d Y H:i', strtotime($row['interview_time'])); // clears out datetime input on null
+$additional_time_1 = $row['alternate_date_1'] == "0000-00-00 00:00:00" ? date('F, d Y H:i') : date('F, d Y H:i', strtotime($row['alternate_date_1']));
+$additional_time_2 = $row['alternate_date_2'] == "0000-00-00 00:00:00" ? date('F, d Y H:i') : date('F, d Y H:i', strtotime($row['alternate_date_2']));
+$additional_time_3 = $row['alternate_date_3'] == "0000-00-00 00:00:00" ? date('F, d Y H:i') : date('F, d Y H:i', strtotime($row['alternate_date_3']));
+
+$client = new \GuzzleHttp\Client();
+
+
+
+try {
+$response = $client->request('GET', 'https://api.manatal.com/open/v3/candidates/'.$candidateID.'/', [
+  'headers' => [
+    'Authorization' => 'Token 92e3967b096dc33e0f09df8c0a927ec0437d8942',
+    'accept' => 'application/json',
+  ],
+]);
+
+	$response->getBody();
+	$responseStr = $response->getBody();
+	$cand_arr = json_decode($responseStr, true);
+	
+} catch (\GuzzleHttp\Exception\ClientException $e) {
+    $statusCode = $e->getResponse()->getStatusCode();
+
+    if ($statusCode === 404) {
+        $isBack = isset($_REQUEST['back']) && $_REQUEST['back'] == 1;
+        $current = isset($_REQUEST['cand']) ? (int) $_REQUEST['cand'] : 0;
+        $next = $isBack ? $current - 2 : $current + 1;
+
+        $next = max(0, $next);
+        $total = isset($_SESSION['candidates']) ? sizeof($_SESSION['candidates']) : 0;
+
+        error_log("Redirecting due to 404. From cand=$current to $next");
+
+        if ($next < $total) {
+            $url = "/rate-candidate/?cand=$next&o=" . urlencode($_REQUEST['o']);
+            if ($isBack) {
+                $url .= "&back=1";
+            }
+            header("Location: $url");
+            exit();
+        } else {
+            // echo "<p>All candidates have been reviewed.</p>";
+            // exit();
+        }
+    } else {
+	
+    // Default wait time
+    $wait = 60;
+
+    if (isset($json['detail']) && preg_match('/available in (\d+) seconds/', $json['detail'], $matches)) {
+        $wait = $matches[1];
+    }
+
+    echo "<p>The server is busy. Please wait {$wait} seconds. The page will reload automatically.</p>";
+    echo "<script>setTimeout(() => { location.reload(); }, " . ($wait * 1000) . ");</script>";
+
+    exit();
+}
+
+    // Other error handling
+    echo "<p>Unexpected error. Please try again.</p>";
+    exit();
+}
+
+
+	// $interview_comments = htmlspecialchars($cand_arr['description']);
+	$interview_comments = htmlspecialchars($row['interview_comments']);
+	// $file_name = $cand_arr['resume'];
+
+if(isset($cand_arr['resume'])) {
+	$has_resume = true;
+} else { 
+	$has_resume = false;
+}	
+	
+	
+/*
+  pre-process resume file name
+  1. create string key(in binary) + employee id + (if custom resume) division id;
+  2. hash resulting string with sha256
+
+  insert "hidden" info
+  1. insert submital date (in seconds since epoch) at index 25
+  2. insert weather custom resume ("1" or "0") at index  20
+*/
+$key = "b549480d7da7dc27a7e431a1c76db244";
+$file_name = hash('sha256', hex2bin($key).$candidateID.($customResume ? $divisionID : ""));
+/*
+inserts expirery date. if null, inserts 30 days from now
+NOTE: null expirery date will always be valid
+*/
+/*
+$processed_file_name = substr_replace($file_name, is_null($invalid_resume_date) ? strtotime('+1 month') : strtotime($invalid_resume_date), 25, 0);
+$processed_file_name = substr_replace($processed_file_name, $customResume ? "1" : "0", 20, 0);
+$resume = "/portal/viewer.php?f=$processed_file_name";
+*/
+list($first_name,$last_name) = explode(" ",htmlspecialchars($row['candidate_name']));
+$ic_comments = $cand_arr['description'];
+// $interview_comments = htmlspecialchars($row['interview_comments']);
+
+// // get candidate's skill
+// $query = "SELECT SK.Code as Code,
+//                   ES.Years_Experience as Years,
+//                   SK.Description as Description,
+//                   ES.Skill_ID as SKILL_ID
+//           FROM EmployeeSkill ES
+//             JOIN IO_SKILL SK on ES.SKILL_ID = SK.Code
+//           WHERE ES.employee_ID = ?
+//             AND SUBSTRING(description,1,4)<>'ZONE'
+//             AND description <>'Interviewed'
+//             AND description <>'Personal'
+//           ORDER BY es.Skill_ID";
+// $pstmt = odbc_prepare($conn,$query);
+// odbc_execute($pstmt, array($employee));
+//
+// $skills = [];
+// while($row = odbc_fetch_array($pstmt)) {
+//   if(strpos("ABCDFJLMIRT",substr($row['Code'],0,1)) != false){
+//     $description = explode('-',htmlspecialchars($row['Description']),2);
+//     $category = $description[0];
+//     $skill = sizeof($description)==1 ? $description[0] : $description[1];
+//
+//     // process skill level
+//     $years_experience = $row['Years'];
+//     if($years_experience < 20)
+//       $skill_level = "Basic";
+//     elseif($years_experience < 25)
+//       $skill_level = "Good";
+//     elseif($years_experience >= 25)
+//       $skill_level = "Excelent";
+//     else
+//       $skill_level = "";
+//     if(!isset($skills[$category])) $skills[$category] = [];
+//     array_push($skills[$category], ['skill' => $skill, 'level' => $skill_level]);
+//   }
+// }
+
+// get all unexpired links for candidate
+/*
+$query = "SELECT name, url
+          FROM ic_candidate_links
+          WHERE candidate_id =?";
+$pstmt = odbc_prepare($conn, $query);
+odbc_execute($pstmt, array($candidateID));
+$links = [];
+
+while($row = odbc_fetch_array($pstmt)) {
+  $link_name = $row['name'];
+  $link_url = $row['url'];
+
+  // add http:// if not already there
+  $parts = parse_url($link_url);
+  if(!isset($parts["scheme"])) {
+    $link_url = "http://$link_url";
+  }
+  if(filter_var($link_url,FILTER_VALIDATE_URL)) {
+    array_push($links, ['name'=>$link_name, 'url'=>$link_url]);
+  }
+}
+*/
+$links = [];
+// echo "link = ".$cand_arr['custom_fields']['linkname']."XXX";
+if(isset($cand_arr['custom_fields']['linkname']) && !empty($cand_arr['custom_fields']['linkname'])&& isset($cand_arr['custom_fields']['link']) && !empty($cand_arr['custom_fields']['link'])) {
+	array_push($links, ['name'=>$cand_arr['custom_fields']['linkname'], 'url'=>$cand_arr['custom_fields']['link']]);
+}
+if(isset($cand_arr['custom_fields']['linkname_b']) && !empty($cand_arr['custom_fields']['linkname_b'])&& isset($cand_arr['custom_fields']['link_b']) && !empty($cand_arr['custom_fields']['link_b'])) {
+	array_push($links, ['name'=>$cand_arr['custom_fields']['linkname_b'], 'url'=>$cand_arr['custom_fields']['link_b']]);
+}
+if(isset($cand_arr['custom_fields']['linkname_c']) && !empty($cand_arr['custom_fields']['linkname_c'])&& isset($cand_arr['custom_fields']['link_c']) && !empty($cand_arr['custom_fields']['link_c'])) {
+	array_push($links, ['name'=>$cand_arr['custom_fields']['linkname_c'], 'url'=>$cand_arr['custom_fields']['link_c']]);
+}
+
+// self Eval is reserved for link "d"
+if(isset($cand_arr['custom_fields']['linkname_d']) && !empty($cand_arr['custom_fields']['linkname_d'])&& isset($cand_arr['custom_fields']['link_d']) && !empty($cand_arr['custom_fields']['link_d'])) {
+	// array_push($links, ['name'=>$cand_arr['custom_fields']['linkname_d'], 'url'=>$cand_arr['custom_fields']['link_d']]);
+	$selfEval = "/wp-content/themes/porto-child/longform/self_eval.php?CID=".$cand_arr['id'];
+}
+
+
+$query = "SELECT * FROM ic_InterviewMediums";
+	$result = mysqli_query($link,$query);
+	
+$mediums = [];
+while($row = mysqli_fetch_array($result)) {
+  $mediums[htmlspecialchars($row['medium_id'])] = ["name" => htmlspecialchars($row['name']), "pattern" => htmlspecialchars($row['pattern']), "info" => htmlspecialchars($row['info'])];
+}
+
+$query = "SELECT * FROM ic_InterviewMediumRequest WHERE candidate_id ='".$candidateID."'";
+	$result = mysqli_query($link,$query);
+
+$selected_mediums = [];
+while($row = mysqli_fetch_array($result)) {
+  $selected_mediums[$row['medium_id']] = htmlspecialchars($row['info']);
+}
+
+?>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS, font-awesome custom CSS -->
+  <link rel="stylesheet" href="/portal/bootstrap-4.3.1-dist/css/bootstrap.min.less.css">
+  <link rel="stylesheet" href="/portal/bootstrap-4.3.1-dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_red.css">
+  <link rel="stylesheet" href="/portal/styles.css">
+  <style>
+  /* used only in rate-candidate for similar width buttons */
+  .custom button.similar {
+    width: 200px;
+  }
+  </style>
+  <?php require_once  dirname(__DIR__) . '/db/portal-bkgrnd.css'; ?>
+
+  <style>
+        #resumeContainer {
+            width: 100%;
+            height: 875px; /* Set the desired height */
+            overflow: hidden;
+        }
+
+        #resumeFrame {
+            width: 100%;
+            height: 100%;
+            border: none; /* Remove iframe border */
+        }
+    </style>
+</head>
+<body>
+<form id="post_rating" action="/portal/manatal_post_ratings.php" method="post" enctype="multipart/form-data">
+  <div style="padding-top:50px;" class="container custom" id="candidates">
+    <div class="row my-3">
+      <div class="col">
+    <input type="hidden" name="candidateNum" value="<?php echo $_REQUEST['cand']; ?>">
+    <input type='hidden' name='e' value='<?php echo $candidateID ?>'>
+    <input type="hidden" name="c" value='<?php echo $candidateID?>'>
+    <input type='hidden' name='o' value='<?php echo $order ?>'>
+    <input type='hidden' name='s' value='<?php echo $submital ?>'>
+    <input type='hidden' name='a' value='<?php echo $assignmentID ?>'>
+    <div class="row">
+      <div class="col-lg-7">
+        <h2>Position: <?php echo $position ?></h2>
+        <h2>Name: <?php echo $first_name ?></h2>
+        <p>Candidate <?php echo $_REQUEST['cand']+1 ?> of <?php echo sizeof($_SESSION['candidates']) ?>  <!-- (click on resume below to open and/or download)-->
+
+  		</p>
+
+  </div>
+      <div class="col-lg-5">
+        <div class="row">
+          <div class="col">
+            <button type="button" id="back" class="btn btn-primary mb-2 similar" onclick="document.location.assign('/portal/manatal_order_candidates.php/?o=<?php echo $order ?>');">back to order</button>
+          </div>
+          <div class="col">
+            <button type="button" id="back" class="btn btn-primary mb-2 similar" onclick="document.location.assign('/portal/manatal_client_portal_dashboard.php/');">back to dashboard</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-6">
+            <div class="form-group">
+            <button type="submit" class="btn btn-primary similar" id="submit_save" <?php if(isset($_SESSION['recruiter_id'])) echo "disabled" ?>>save</button>
+              <!-- Trigger/Open The Modal
+              <button type="button" class="btn btn-secondary set_interview_btn similar" id="interview1">set up an interview!</button>   -->
+            </div>
+          </div>
+          <div class="pagination">
+		  
+<!--		<button type="button" class="btn btn-link prev" <?php if($_REQUEST['cand'] == 0) {echo ' disabled';} ?>>
+		-->
+<button type="button" class="btn btn-link prev"
+  onclick="location.assign('/portal/manatal_rate_candidates.php/?cand=<?php echo $_REQUEST['cand'] - 1 ?>&o=<?php echo $order ?>&back=1')"
+  <?php if ($_REQUEST['cand'] == 0) echo 'disabled'; ?>>
+  Prev
+</button>
+		
+          <!--  <button type="button" class="btn btn-link next" <?php if($_REQUEST['cand'] == sizeof($_SESSION['candidates']) - 1) echo 'disabled'; ?>>Next</button>
+          -->
+		  <button type="button" class="btn btn-link next" <?php if($_REQUEST['cand'] == sizeof($_SESSION['candidates']) - 1) {echo ' disabled';} ?>>
+         Next
+    </button>
+
+
+	   </div>
+        </div>
+      </div>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-lg-7">
+        <div class="form-group">
+          <?php if($is_valid) { ?>
+		  <!--
+            <a href="<?php echo $resume ?>" target="_blank">
+              <canvas id="resume" class="resume"></canvas>
+            </a>
+          <?php } else { ?>
+            <h1>Oh no!! Looks like this candidate has expired.</h1>
+            <h3>
+              If you would like to see more of their information, please contact your recruiter <?php echo $recruiter_name ?> at <?php echo $recruiter_email ?>
+            </h3>
+          <?php } ?>
+		  -->
+		  
+		<div id="resumeContainer">
+
+		<?php if($has_resume) {
+			$encoded_url = urlencode($cand_arr['resume']);
+		?>
+			<iframe id="resumeFrame"
+            src="/portal/manatal_resume_proxy.php?url=<?php echo $encoded_url; ?>"
+            style="width:100%; height:1000px;" frameborder="0"></iframe>
+			<?php } else { ?>
+			<p>Resume not loaded or corrupted. Please notify your recruiter.</p>
+			<?php } ?>	
+		</div>
+<div>
+<button type="button" id="back" class="btn btn-primary mb-2 similar"
+        onclick="window.open('/portal/manatal_resume_proxy.php?url=<?php echo urlencode($cand_arr['resume']); ?>', '_blank')">
+    Open Full Screen
+</button></div>
+		  
+		  
+        </div>
+      </div>
+      <div class="col-lg-5">
+        <input type="hidden" class="rating" id="rating" name="rating" data-original="<?php echo $rating ?>" value="<?php echo $rating ?>">
+        <div class="form-group star_group" id="group">
+          <div class="form-check form-check-inline mr-0">
+            <input type="radio" class="star d-none" id="star1" name="rate" value="1" />
+            <label for="star1" title="text" class="star_label star_input form-check-label">★</label>
+          </div>
+          <div class="form-check form-check-inline mr-0">
+            <input type="radio" class="star d-none" id="star2" name="rate" value="2" />
+            <label for="star2" title="text" class="star_label star_input form-check-label">★</label>
+          </div>
+          <div class="form-check form-check-inline mr-0">
+            <input type="radio" class="star d-none" id="star3" name="rate" value="3" />
+            <label for="star3" title="text" class="star_label star_input form-check-label">★</label>
+          </div>
+          <div class="form-check form-check-inline mr-0">
+            <input type="radio" class="star d-none" id="star4" name="rate" value="4" />
+            <label for="star4" title="text" class="star_label star_input form-check-label">★</label>
+          </div>
+          <div class="form-check form-check-inline mr-0">
+            <input type="radio" class="star d-none" id="star5" name="rate" value="5" />
+            <label for="star5" title="text" class="star_label star_input form-check-label">★</label>
+          </div>
+        </div>
+        <div class="form-group">
+		<h4>
+		<?php
+			IF ($rate != "$0.00") {echo $rate . "/hr "; }
+			IF ($salary != "") {echo "$".number_format($salary,2) . "/yr "; }
+		?>
+		</h4>
+        </div>
+
+        <div class="form-group">
+        <!-- Trigger/Open The Modal -->
+		<button type="button" class="btn btn-secondary set_interview_btn similar" id="interview1">set up an interview!</button>
+	
+		</div>
+
+        <div class="form-group">
+				<p class="comment">
+				<?php // echo preg_replace('/[\x80-\xFF]/', '', trim($ic_comments) ) ?>
+				<?php echo (trim($ic_comments))  ?>
+				</p>
+        	<!-- <p class="comment"><?php // echo $ic_comments ?></p> -->
+        </div>
+
+        <div class="form-group">
+          <label for="comments">Candidate Comments</label>
+          <textarea id="comments" name="comments" class="form-control" placeholder="What do you think?" data-original="<?php echo $customer_comments ?>" oninput="setChanged(this);"><?php echo $customer_comments ?></textarea>
+        </div>
+        <div class="form-group">
+          <div class="form-check">
+            <input type="checkbox" id="decline" class="form-check-input check-control" name="decline" value="1" <?php echo $declined ? 'checked' : '' ?>>
+            <label for="decline" class="form-check-label">Decline</label>
+            <div class="decline check-detail">
+              <label for="decline_comments">We are so sorry you did not like this candidate. Please tell us what was wrong so we can get you a better match.</label>
+              <textarea id="decline_comments" name="decline_comments" class="form-control" style="resize: none;" placeholder="What went wrong?"><?php echo $declined_comments ?></textarea>
+            </div>
+          </div>
+        </div>
+        <?php if($is_valid && sizeof($links) > 0 || isset($val) ) { ?>
+          <div class="form-group">
+            <p>Additional Links</p>
+            <?php if(isset($selfEval)){ ?>
+				<button type="button" class="btn btn-primary mb-1" onclick="window.open('<?php echo $selfEval; ?>', 'popup', 'width=800,height=800');">Skills Self-Eval</button>
+			<?php 
+			}
+            foreach($links as $link) { ?>
+              <button type="button" class="btn btn-primary mb-1" onclick="window.open('<?php echo $link['url'] ?>')"><?php echo $link['name'] ?></button>
+            <?php } ?>
+          </div>
+        <?php } ?>
+        <!-- <div class="form-group">
+          <div class="columns">
+            <p class="skills">
+              <?php // foreach($skills as $key => $val) {?>
+                <span class="skills-cat"><?php echo $key ?><br></span>
+                <?php // foreach($val as $skill) { ?>
+                  <?php // echo $skill['skill'].": ".$skill['level'] ?><br>
+                <?php // } ?>
+                <br>
+              <?php // } ?>
+            </p>
+          </div>
+        </div> -->
+        <div class="row">
+          <div class="col-6">
+            <div class="form-group">
+              <!-- Trigger/Open The Modal -->
+              <button type="button" class="btn btn-secondary set_interview_btn similar" id="interview2">set up an interview!</button>
+
+		</div>
+          </div>
+          <div class="pagination">
+            <button type="button" class="btn btn-link share">share <i class="fa fa-share"></i></button>
+			<button type="button" class="btn btn-link prev" <?php if($_REQUEST['cand'] == 0) {echo ' disabled';} ?>>
+ 		    <button type="button" class="btn btn-link next" <?php if($_REQUEST['cand'] == sizeof($_SESSION['candidates']) - 1) {echo ' disabled';} ?>>			
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <button type="submit" class="btn btn-primary similar" id="submit_save" <?php if(isset($_SESSION['recruiter_id'])) echo "disabled" ?>>save</button>
+          </div>
+          <div class="col">
+            <button type="button" id="back" class="btn btn-primary mb-2 similar" onclick="document.location.assign('/portal/manatal_order_candidtes.php/?o=<?php echo $order ?>');">back to order</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- The Modal -->
+<div id="myModal" class="modal">
+
+  <!-- Modal content -->
+  <div class="container custom modal-content">
+    <div class="row">
+      <div class="col-10">
+        <span class="float-left"><h1>Interview Request</h1></span>
+      </div>
+      <div class="col">
+        <span class="close float-right" id="close_interview_dialogue">&times;</span>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="form-group">
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="interview_option" id="asap" value="0" <?php if(!$time_set) echo "checked" ?>>
+            <label class="form-check-label" for="asap">
+              Love 'em, please set up an interview ASAP.
+            </label>
+          </div>
+          <div class="form-group" onclick="document.getElementById('set_date').checked = true;">
+            <div class="row">
+              <div class="col-md">
+                <div class="form-group row" >
+                  <div class="col-lg-3">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="interview_option" id="set_date" value="1" <?php if($time_set) echo "checked" ?>>
+                      <label for="set_date" class="form-check-label">I'm available on:</label>
+                    </div>
+                    <div class="form-check">
+                      <input type="text" class="form-control" id="interviewDate" placeholder="Interview date" name="interview_date" data-input value="<?php echo $time; ?>">
+                    </div>
+                  </div>
+                  <div class="col">
+                    <div class="form-check">
+                      <label class="form-check-label" for="additionalDate1">Optional addtional dates</label>
+                    </div>
+                    <div class="form-check">
+                      <input type="text" class="form-control mb-1" class="mb-1" id="additionalDate1" placeholder="Additional date" name="additional_date[]" data-input value="<?php echo $additional_time_1; ?>">
+                      <input type="text" class="form-control mb-1" id="additionalDate2" placeholder="Additional date" name="additional_date[]" data-input value="<?php echo $additional_time_2; ?>">
+                      <input type="text" class="form-control mb-1" id="additionalDate3" placeholder="Additional date" name="additional_date[]" data-input value="<?php echo $additional_time_3; ?>">
+                    </div>
+                  </div>
+                </div>
+                <p>Dates are subject to change on availability of talent</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Interview Medium</label>
+          <div class="row">
+            <div class="col-lg">
+              <?php $i = 0; foreach($mediums as $key => $val) { // loop through all mediums ?>
+                <div class="form-group row">
+                  <div class="col">
+                    <div class="form-check">
+                      <input class="form-check-input medium_include" type="checkbox" value="<?php echo $key ?>" name="medium_include<?php echo $key ?>" id="medium_<?php echo $key ?>" <?php if(isset($selected_mediums[$key])) echo "checked" ?>>
+                      <label class="form-check-label" for="medium_<?php echo $key ?>">
+                        <?php echo $val['name'] ?>
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-md-8">
+                    <?php if($val['pattern'] == "textarea") : // make textarea ?>
+                      <textarea id="input_mask-<?php echo $key ?>" class="form-control medium_mask" data-type="<?php echo $key?>" data-pattern="" placeholder="<?php echo $val['info'] ?>"></textarea>
+                    <?php else : ?>
+                      <input type="text" id="input_mask-<?php echo $key ?>" class="form-control medium_mask" data-type="<?php echo $key?>" data-pattern="<?php echo $val['pattern'] == 'address' ? "" : $val['pattern'] ?>" placeholder="<?php echo $val['info'] ?>">
+                    <?php endif; ?>
+                    <input type="hidden" class="medium_info" id="input-<?php echo $key ?>" name="medium_info[]" data-type="<?php echo $key ?>" value="<?php if(isset($selected_mediums[$key])) echo $selected_mediums[$key] ?>">
+                  </div>
+                </div>
+                <?php
+                $i++;
+                if($i == sizeof($mediums) / 2) echo "</div><div class='col-lg'>";
+              } ?>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="msg">Interview Comments</label>
+          <textarea id="interview_comments" name="interview_comments" class="form-control" placeholder="Any interview requests or other information?"><?php echo $interview_comments ?></textarea>
+        </div>
+        <div class="form-group">
+          <button type="submit" class="btn btn-primary" id="submit_interview" <?php if(isset($_SESSION['recruiter_id'])) echo "disabled" ?>>Set an interview</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</form>
+
+<div id="share_dialogue" class="modal">
+  <form id="share" action="">
+    <div class="container custom modal-content">
+      <div class="row">
+        <div class="col-10">
+          <span class="float-left"><h1>Share Candidate</h1></span>
+        </div>
+        <div class="col-2">
+          <span class="close float-md-right" id="close_share_dialogue">&times;</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="share_email">Email</label>
+        <input type="email" id="share_email" class="form-control">
+        <div class="error" id="share_message">
+      </div>
+      </div>
+      <div class="form-group">
+        <button type="submit" class="btn btn-primary" id="share_submit">Share</button>
+      </div>
+    </div>
+  </form>
+
+
+<?
+
+<!-- Bootstrap JS
+    PDFJS
+    Star-->
+<script src="/portal/bootstrap-4.3.1-dist/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.7.570/build/pdf.min.js"></script>
+<!-- <script type="text/javascript" src="//mozilla.github.io/pdf.js/build/pdf.js"></script> -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+  // Handler when the DOM is fully loaded
+  var set_interview = <?php echo((isset($_REQUEST['i']) && $_REQUEST['i'] == 1) ? 1: 0); ?>
+
+  if(set_interview) {
+    alert("Message received! We'll contact you with the candidate's availability shortly.")
+  }
+});
+
+// prevent submit on enter
+
+// add h hours to date
+Date.prototype.addHours = function(h) {
+  this.setTime(this.getTime() + (h*60*60*1000));
+  return this;
+}
+
+var now = new Date();
+let interviewDate = document.getElementById('interviewDate');
+flatpickr("#interviewDate", {
+  enableTime: true,
+  static: true,
+  dateFormat: "F, d Y H:i",
+  defaultDate: interviewDate.value == "" ? now.addHours(1) : interviewDate.value, // 1 hour from now
+  minuteIncrement: 1,
+  minDate: "today"
+});
+
+flatpickr("#additionalDate1", {
+  enableTime: true,
+  static: true,
+  dateFormat: "F, d Y H:i",
+  minuteIncrement: 1,
+  minDate: "today"
+});
+
+flatpickr("#additionalDate2", {
+  enableTime: true,
+  static: true,
+  dateFormat: "F, d Y H:i",
+  minuteIncrement: 1,
+  minDate: "today"
+});
+
+flatpickr("#additionalDate3", {
+  enableTime: true,
+  static: true,
+  dateFormat: "F, d Y H:i",
+  minuteIncrement: 1,
+  minDate: "today"
+});
+
+// determine if any inputs have changed and should be saved
+function shouldSave() {
+  var numChanged = 0;
+  Array.prototype.forEach.call(document.querySelectorAll('input[data-changed]'), function(input) {
+    if(input.dataset.changed === "1") {
+      numChanged++;
+    }
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('textarea[data-changed]'), function(input) {
+    if(input.dataset.changed === "1") {
+      numChanged++;
+    }
+  });
+  if(numChanged > 0) {
+    return !confirm("There is at least one field that has not been saved. Are you sure you want to leave this page without saving?");
+  }
+  return 0;
+}
+
+// add data-changed to input for validation. used onchange
+function setChanged(input) {
+  if(input.value !== input.dataset.original) {
+    input.dataset.changed = 1;
+  } else {
+    input.dataset.changed = 0;
+  }
+}
+
+var preventSubmit = function(e) {
+  if(!e.target.matches('textarea') && !e.target.matches('submit')) {
+    var keyCode = e.keyCode || e.which;
+    if (keyCode === 13) {
+      e.preventDefault();
+      return false;
+    }
+  }
+}
+
+window.addEventListener('keyup', preventSubmit, false);
+window.addEventListener('keypress', preventSubmit, false);
+
+// Setup stars
+var checkedStar = document.getElementById('rating').value;
+Array.prototype.forEach.call(document.getElementsByClassName('star'), function(e) {
+  // set appropriate stars to checked
+  if(e.checked) {
+    checkedStar = e.value;
+  }
+});
+if(checkedStar != 0) document.getElementById('star'+checkedStar).checked = true;
+
+// render pdf
+<?php if($is_valid) { ?>
+var canvas = document.getElementById('resume');
+var pdfjs = window['pdfjs-dist/build/pdf'];
+pdfjs.GlobalWorkerOptions.workerSrc =
+  "https://cdn.jsdelivr.net/npm/pdfjs-dist@2.7.570/build/pdf.worker.min.js";
+// '//mozilla.github.io/pdf.js/build/pdf.worker.js';
+var pdf = "<?php echo $resume ?>";
+var loadingTask = pdfjs.getDocument(pdf);
+loadingTask.promise.then(function(pdf) {
+  console.log('PDF loaded');
+
+  // Fetch the first page
+  var pageNumber = 1;
+  pdf.getPage(pageNumber).then(function(page) {
+    console.log('Page loaded');
+
+    var renderScale = 3;  // resolution goes up as scale goes up
+    var viewport = page.getViewport({scale:renderScale});
+    var context = canvas.getContext('2d');
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    canvas.style.width = '100%';
+    canvas.style.height = viewport.height*(canvas.style.width/canvas.width);
+
+    // Render PDF page into canvas context
+    var renderContext = {
+      canvasContext: context,
+      viewport: viewport
+    };
+    var renderTask = page.render(renderContext);
+    renderTask.promise.then(function () {
+      console.log('Page rendered');
+    });
+  });
+}, function (e) {
+  // PDF loading error
+  console.error(e);
+});
+<?php } ?>
+
+var modal = document.getElementById('myModal');
+
+/*
+  input - bool (require)
+  set each mask's required property to input
+*/
+function set_require(require) {
+  document.getElementById("asap").required = require;
+  document.getElementById("set_date").required = require;
+  Array.prototype.forEach.call(document.querySelectorAll('.medium_mask'), function(mask) {
+    mask.required = mask.dataset.required === "true" && require;
+  });
+}
+
+// When user clicks the button, open the modal display
+Array.prototype.forEach.call(document.getElementsByClassName('set_interview_btn'), function(e) {
+  e.addEventListener('click', function() {
+    set_require(true);
+    modal.style.display = "block";
+  }, false)
+});
+
+// When the user clicks on (x), close the modal
+document.getElementById('close_interview_dialogue').addEventListener('click', function() {
+  modal.style.display="none";
+  set_require(false);
+}, false);
+
+// share modal control
+var share = document.getElementById('share_dialogue');
+
+Array.prototype.forEach.call(document.getElementsByClassName('share'), function(e) {
+  e.addEventListener('click', function() {
+    share.style.display = "block";
+  }, false);
+});
+
+document.getElementById('close_share_dialogue').addEventListener('click', function() {
+  share.style.display="none";
+}, false);
+
+document.getElementById('share').addEventListener('submit', function(e) {
+  let btn = document.getElementById('share_submit');
+  document.getElementById('share_message').innerHTML = "";
+  btn.disabled = true;
+  btn.innerHTML = "Please wait...";
+  var share_email = document.getElementById('share_email');
+  var address = share_email.value;
+  share_email.value = '';
+
+  // create new share ticket and retrieve seletor (s) and validator (t)
+  var xhttp = new XMLHttpRequest();
+  xhttp.open('POST', '/portal/manatal_process_share.php', true);
+  xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  xhttp.onreadystatechange = function() {
+    if(this.readyState == 4 && this.status == 200) {
+      try {
+        btn.innerHTML = "Share";
+        btn.disabled = false;
+
+        var data = JSON.parse(this.response);
+        if("e" in data) {
+          alert("Sorry, there was a problem sharing this candidate.");
+        } else {
+          /*
+            selector = data.s
+            validator = data.t
+          */
+
+          document.getElementById('share_message').innerHTML = "Message successfully sent. You may need to alert the recipient to check their spam folder.";
+          // window.location.href = 'mailto:'+address+'?body=Please%20check%20out%20this%20candidate%20icreatives%20sent%20to%20us%20for%20the%20position%20<?php echo $position ?>.%0A%0AYou%20can%20find%20their%20information%20here%3A%0Ahttps%3A%2F%2Fwww.icreatives.com%2Fpreview-candidate%2F%3Fd%3D'+data.s+'%26v%3D'+data.t+'&subject=This%20candidate%20is%20wonderful!!';
+        }
+      } catch(err) {
+        alert("There was a problem sharing this candidate.");
+        console.log(this.response);
+      }
+    }
+  }
+  xhttp.send("email="+address+"&o=<?php echo $order ?>&c=<?php echo $candidateID ?>");
+  e.preventDefault();
+});
+
+/*
+  process click "away" from a modal view
+  more accurately, this is a click on the modal view's background
+*/
+window.onclick = function(e) {
+  if (e.target == modal) {
+    // unrequire modal's mask inputs
+    set_require(false);
+    modal.style.display = "none";
+  } else if (e.target == share) {
+    share.style.display = "none";
+  }
+}
+
+/*
+  format a string
+  result -
+    {
+      formatted - formatted string
+      value - raw value
+    }
+
+  0 - any digit
+  * - any char
+*/
+String.prototype.format = function(format) {
+  var original = this;
+  var final = {
+    formatted: "",
+    value: ""
+  };
+  var j = 0;
+  for(let i = 0; i < format.length && j < original.length; i++) {
+    if(format[i] === '0') {
+      if(/^[0-9]$/.test(original[j])) {
+        final.formatted += original[j];
+        final.value += original[j];
+      }
+      j++;
+    } else if(format[i] === '*') {
+      final.formatted += original[j];
+      final.value += original[j];
+      j++;
+    } else {
+      final.formatted += format[i];
+    }
+  }
+  return final;
+}
+
+/*
+  input - formatted string (this), format
+  output - raw value
+*/
+String.prototype.normalize = function(format) {
+  var original = this;
+  var final = "";
+
+  var skipped = "";
+
+  /*
+    skipped not empty and original[j+] equals skipped
+      go back in format string by the number of characters that were skipped
+    format[i] = '0'
+      if original[j] is a digit, add to final
+      else continue to next format character
+    format[i] = '*'
+      add original[j] to final
+    else
+      "automatcally added" characters not yet in string
+      skip format[i] and add to skipped
+  */
+  for(i = 0, j = 0; i < format.length && j < original.length; i++) {
+    if(skipped != "" && original.substr(j, skipped.length) === skipped) {
+      i -= skipped.length;
+      skipped = '';
+    } else if(format[i] === '0') {
+      if(/^[0-9]$/.test(original[j])) {
+        final += original[j];
+      } else {
+        continue;
+      }
+    } else if(format[i] === '*') {
+      final += original[j];
+    } else if(original[j] !== format[i]) {
+      skipped += format[i];
+      continue;
+    }
+    j++;
+  }
+
+  return final;
+}
+
+// format each mask
+Array.prototype.forEach.call(document.getElementsByClassName('medium_info'), function(e) {
+  var mask = document.getElementById('input_mask-'+e.dataset.type);
+  if(mask.dataset.pattern === "") {
+    mask.value = e.value;
+    return;
+  }
+  var result = e.value.format(mask.dataset.pattern);
+  mask.value = result.formatted;
+});
+
+// process input to mask
+Array.prototype.forEach.call(document.getElementsByClassName('medium_mask'), function(mask) {
+  mask.addEventListener('input', function() {
+    var type = mask.dataset.type;
+    mask.required = true;
+    document.getElementById('medium_'+type).checked = true;
+    try {
+      if(mask.dataset.pattern === "") {
+        document.getElementById('input-'+type).value = mask.value;
+        return;
+      }
+      var cursorLoc = mask.selectionStart; // original cursor location
+      var originalMask = mask.value; // original value
+      var originalVal = document.getElementById('input-'+type).value; // original raw value
+      var val = mask.value.normalize(mask.dataset.pattern); // raw value
+      var result = val.format(mask.dataset.pattern); // result of format raw value
+      console.log([val, result]);
+      document.getElementById('input-'+type).value = result.value; // set input to raw value
+      mask.value = result.formatted; // set mask to formatted value
+
+      // handle cursor Location
+      // TODO: properly handle input from center
+      if(result.value.length > originalVal.length) {
+        //this.setSelectionRange(cursorLoc + (result.value.length - originalVal.length), cursorLoc + (result.value.length - originalVal.length));
+      } else {
+        this.setSelectionRange(cursorLoc, cursorLoc);
+      }
+    } catch(err) {
+      console.log(err);
+    }
+
+    if(mask.value.length !== mask.dataset.pattern.length && mask.dataset.pattern !== "" && mask.value.length !== 0) {
+      mask.setCustomValidity("Please completely fill this field.");
+    } else {
+      mask.setCustomValidity("");
+    }
+  }, false);
+});
+
+// update rating hidden input's value
+Array.prototype.forEach.call(document.getElementsByClassName('star'), function(e) {
+  e.addEventListener('change', function() {
+    document.getElementById('rating').value = e.value;
+    setChanged(document.getElementById('rating'));
+  }, false);
+});
+
+// process next button
+Array.prototype.forEach.call(document.getElementsByClassName('next'), function(e) {
+  e.addEventListener('click', function() {
+    if(!shouldSave())
+      document.location.assign("/portal/manatal_rate_candidates.php/?cand=<?php echo $_REQUEST['cand'] + 1 ?>&o=<?php echo $order ?>");
+  }, false);
+});
+
+var comments = document.getElementById('decline_comments');
+var interview_btn1 = document.getElementById('interview1');
+var interview_btn2 = document.getElementById('interview2');
+var decline = document.getElementById('decline');
+
+if(decline.checked) {
+  interview_btn1.disabled = true;
+  interview_btn2.disabled = true;
+} else {
+  interview_btn1.disabled = false;
+  interview_btn2.disabled = false;
+}
+
+decline.addEventListener('change', function() {
+  if(this.checked) {
+    comments.required = true;
+    interview_btn1.disabled = true;
+    interview_btn2.disabled = true;
+  } else {
+    comments.required = false;
+    interview_btn1.disabled = false;
+    interview_btn2.disabled = false;
+  }
+});
+
+// process prev button
+Array.prototype.forEach.call(document.getElementsByClassName('prev'), function(e) {
+  e.addEventListener('click', function() {
+    if(!shouldSave())
+      document.location.assign("/portal/manatal_rate_candidates.php/?cand=<?php echo $_REQUEST['cand'] - 1; ?>&o=<?php echo $order ?>");
+  }, false);
+});
+
+// process a change of interview time radio button
+Array.prototype.forEach.call(document.querySelector('input[type="radio"][name="interview_option"]'), function(e) {
+  e.addEventListener('change', function() {
+    // set required to true
+    document.getElementById('interviewDate').required = this.value == "1";
+  }, false);
+});
+
+// set input-mask required to true/false on change of medium_include checkbox
+Array.prototype.forEach.call(document.querySelectorAll('.medium_include'), function(include) {
+  if(include.checked) {
+    document.getElementById('input_mask-'+include.value).required = true;
+    document.getElementById('input_mask-'+include.value).dataset.required = true;
+  } else {
+    document.getElementById('input_mask-'+include.value).required = false;
+    document.getElementById('input_mask-'+include.value).dataset.required = false;
+  }
+  include.addEventListener('change', function() {
+    if(this.checked) {
+      document.getElementById('input_mask-'+include.value).required = true;
+      document.getElementById('input_mask-'+include.value).dataset.required = true;
+    } else {
+      document.getElementById('input_mask-'+include.value).required = false;
+      document.getElementById('input_mask-'+include.value).dataset.required = false;
+    }
+  });
+});
+
+document.getElementById('post_rating').addEventListener('submit', function(e) {
+  var form = document.getElementById('post_rating');
+  var lastFocus = form.dataset.lastFocus;
+  if(lastFocus == 'interview') {
+    // Array.prototype.forEach.call(document.querySelectorAll('.medium_info'), function(medium) {
+    //   if(document.getElementById('medium_'+medium.data.type).checked && medium.value == "") {
+    //     e.preventDefault();
+    //     alert()
+    //     return false;
+    //   }
+    // }
+
+    const hiddenField = document.createElement('input');
+    hiddenField.type = 'hidden';
+    hiddenField.name = "set_interview";
+    hiddenField.value = "1";
+
+
+    form.appendChild(hiddenField);
+  }
+
+  return true;
+}, false);
+
+Array.prototype.forEach.call(document.querySelectorAll('button[type="submit"]'), function(e) {
+  e.addEventListener('focus', function() {
+    if(e.id=="submit_interview") {
+      document.getElementById('post_rating').dataset.lastFocus = 'interview';
+    } else {
+      document.getElementById('post_rating').dataset.lastFocus = 'save';
+    }
+  }, false);
+
+  e.addEventListener('click', function() {
+    if(e.id=="submit_interview") {
+      document.getElementById('post_rating').dataset.lastFocus = "interview";
+    } else {
+      document.getElementById('post_rating').dataset.lastFocus = "save";
+    }
+  }, false);
+});
+
+</script>
+<script src="/portal/helper/star.js"></script>
+</body>
+</html>

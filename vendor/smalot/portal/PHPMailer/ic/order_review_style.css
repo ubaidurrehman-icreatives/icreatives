@@ -1,0 +1,13 @@
+.candidate, .card-header, .order {
+  cursor: pointer;
+}
+
+.star_label {
+  color:#ccc;
+  font-size: 1.2rem;
+  margin-right: 2px;
+}
+
+.selected {
+  color:#B22625;
+}

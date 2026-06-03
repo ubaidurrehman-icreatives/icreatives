@@ -1,0 +1,141 @@
+
+<%
+' Disable Caching
+Dim PStr
+pStr = "private, no-cache, must-revalidate" 
+Response.ExpiresAbsolute = #2000-01-01# 
+Response.AddHeader "pragma", "no-cache" 
+Response.AddHeader "cache-control", pStr 
+%> 
+
+
+<!-- #include file="common2.asp"-->
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="https://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="description" content="Contact your nearest i creatives office in the LA, San Francisco, Miami, Fort Lauderdale, San Jose, New York City, New Jersey and Atlanta for your creative staffing needs, or for freelance marketing or creative design positions.">
+<meta name="keywords" content="creative staffing, jobs in marketing, freelance employment, Graphic Designers, Web Designers">
+
+<title>i creative staffing login screen</title>
+
+<link rel='stylesheet' id='bootstrap-css-css'  href='/wp-content/themes/vg-mirinae/css/bootstrap.min.css?ver=3.3.5' type='text/css' media='all' />
+<link rel='stylesheet' id='mirinae-css-css'  href='/wp-content/themes/vg-mirinae/css/theme1.css?ver=1.0.0' type='text/css' media='all' />
+
+
+
+    <link href="/webtime/css/style.css" rel="stylesheet" type="text/css" />
+    <link href='https://fonts.googleapis.com/css?family=Lato|Rokkitt' rel='stylesheet' type='text/css' />
+<link href='https://fonts.googleapis.com/css?family=Lato:400normal,light,regular,bold,bolditalic|Rokkitt:regular,bold,bolditalic' rel='stylesheet' type='text/css' />
+<style>
+.checkbox, .radio {
+	width: 19px;
+	height: 25px;
+	padding: 0 5px 0 0;
+	background: url(/webtime/css/checkbox.gif) no-repeat;
+	display: block;
+	clear: left;
+	float: left;
+}
+.radio {
+	background:url(/webtime/css/radio.png) no-repeat;
+}
+.select {
+	position: absolute;
+	height:23px;
+	width:auto;
+	padding: 0px 54px 0px 7px;
+	color: #fff;
+	font-family:'Lato', 'sans-serif';
+	font-size:11px;
+	background:url(/webtime/css/dropdown_img.png) no-repeat right;
+	line-height:24px;
+	overflow: hidden;
+}
+</style>
+    <link rel="stylesheet" type="text/css" href="/webtime/css/css.css" />
+
+    <script type="text/javascript" src="/webtime/css/js/js.js"></script>
+    <script type="text/javascript" src="/webtime/css/jquery.js"></script>
+    <script type="text/javascript" src="/webtime/css/custom-form-elements.js"></script>
+
+
+
+
+<style>
+
+// input{background-color:#ffffff; color:#000000; font-size:11px; font-family:'Lato', 'sans-serif'; border:0px; border-top:solid 1px #666768; border-left:solid 1px #666768; padding-left:10px; line-height:14px; height:16px; }
+// select{background-color:#ffffff; color:#000000; font-weight:normal; font-size:12px; font-family:'Lato', 'sans-serif'; border:0px; border-top:solid 1px #666768; border-left:solid 1px #666768;  line-height:15px; height:18px;}
+
+.defaulttable {
+  display: table;
+}
+.defaulttable thead {
+  display: table-header-group;
+}
+.defaulttable tbody {
+  display: table-row-group;
+}
+.defaulttable tfoot {
+  display: table-footer-group;
+}
+.defaulttable tbody>tr:hover,
+.defaulttable tbody>tr {
+  display: table-row;
+}
+.defaulttable tbody>tr:hover>td,
+.defaulttable tbody>tr>td {
+  display: table-cell;
+}
+.defaulttable,
+.defaulttable tbody,
+.defaulttable tbody>tr:hover,
+.defaulttable tbody>tr,
+.defaulttable tbody>tr:hover>td,
+.defaulttable tbody>tr>td,
+.defaulttable tbody>tr:hover>th,
+.defaulttable tbody>tr>th,
+.defaulttable thead>tr:hover>td,
+.defaulttable thead>tr>td,
+.defaulttable thead>tr:hover>th,
+.defaulttable thead>tr>th,
+.defaulttable tfoot>tr:hover>td,
+.defaulttable tfoot>tr>td,
+.defaulttable tfoot>tr:hover>th,
+.defaulttable tfoot>tr>th {
+  background: transparent;
+  border: 0px solid #000;
+  border-spacing: 0px;
+  border-collapse: separate;
+  empty-cells: show;
+  padding: 0px;
+  margin: 0px;
+  outline: 0px;
+  font-size: 15px;
+  vertical-align: middle;
+  text-align: left;
+  font-family: Lato;
+  table-layout: auto;
+  
+}
+</style>
+
+
+
+
+    
+<style type="text/css"> 
+body {background:#ffffff;} 
+</style>
+
+</head>
+<body>
+                                         <!-- Insert Code Here -->
+                            
+<!-- #include file="Asn_Approve_1.asp"-->
+ 
+<div style="clear:left; height:30px;"> &nbsp;</div>
+</body>
+</html>
+

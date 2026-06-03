@@ -1,0 +1,34 @@
+.resume {
+  background-color: gray;
+}
+
+.input {
+  width:200px;
+}
+
+.columns {
+ /* Standard syntax */
+  column-count: 3;
+}
+
+.skills {
+  font-size: .7rem;
+  list-style-type: none;
+}
+
+.skills-cat {
+  font-weight: bold;
+}
+
+/* rating bar */
+.star_label {
+  font-size:60px;
+  color:#ccc;
+}
+.star {
+    display:none;
+    margin:0;
+}
+.selected {
+  color:#B22625;
+}

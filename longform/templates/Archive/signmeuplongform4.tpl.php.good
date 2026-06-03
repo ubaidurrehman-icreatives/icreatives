@@ -1,0 +1,314 @@
+﻿        <div class="rightpart" >
+          <div style="float:left;">
+            <div style="clear:left; padding:0px 0 0 0px;">
+              <div style="float:left; width:200px; height:41px;"><a href="/talent-home-graphic-web-designer-jobs/"><img src="https://<?php echo  $_SERVER['SERVER_NAME'] . '/' .  $_SERVER['PATH_INFO'] . $formpath; ?>/images/returntocreativehome.png" alt="" /></a></div>
+              <div style="float:left; width:468px;  height:41px;"><img src="https://<?php echo  $_SERVER['SERVER_NAME'] . '/' .  $_SERVER['PATH_INFO'] . $formpath; ?>/images/progressbar3.png" alt="" /></div>
+              <div style="float:left; width:118px;  height:41px;"><a href="#"><img src="https://<?php echo  $_SERVER['SERVER_NAME'] . '/' .  $_SERVER['PATH_INFO'] . $formpath; ?>/images/contact.png" alt="" /></a></div>
+            </div>
+          </div>
+      </div>
+      <div style="float:left; width:960px;">
+        <div style="float:left; width:142px;"> &nbsp; </div>
+        <div style="float:right; width:794px; margin-right:10px; padding-bottom:20px;">
+          <div style="float:left; width:784px; padding-top:15px;">
+            <div style="float:left;">
+              <div style="float:left;" class="largetxt1"><span class="redarrowclass1"> [</span> creative talent application </div>
+              <div style="float:left; padding:3px 2px 0 3px;" class="redarrowclass1"> >>> </div>
+            </div>
+          </div>
+<!--
+           <form action="<?php echo CURRENTDOMAIN . '/empact/PHP_SubmitLongForm.asp'; ?>" ENCTYPE="multipart/form-data" method="post" id="signupform" name="signupform">
+--> 
+            <form action="<?php echo CURRENTDOMAIN . '/wp-content/themes/vg-mirinae/LongForm/SignMeUpLongUpload.php'; ?>" ENCTYPE="multipart/form-data" method="post" id="signupform" name="signupform">
+
+            <input id="item_number" name="item_number" value="<?php echo $item_num ?>" type="hidden" value="" />
+            <input id="current_state" name="current_state" value="s4" type="hidden" value=""  />
+            <input id="RMail" name="RMail" value="<?php echo $RMail ?>" type="hidden"  />
+
+            
+          <div style="clear:left; height:50px;"> &nbsp;</div>
+          <div style="float:left;" >
+            <div style="float:left;" class="btnbg">
+              <div style="float:left; width:300px;  padding:16px 0 0 60px;"> <a href="#" class="whitetxt1"> management </a> </div>
+            </div>
+            <div style="clear:left; padding:20px 0 0 70px;">
+              <div style="clear:left;" class="bottomarrow"> Account & Studio </div>
+              <div style="clear:left; height:20px;"> </div>
+              <div style="float:left; width:100px;" class="graytxt3"> Account Mng </div>
+                <?php printRadio("SKILL_B05"); ?>
+
+              <div style="float:left;  width:100px;" class="graytxt3"> Project Mng <br />
+                Print </div>
+              <?php printRadio("SKILL_B80"); ?>
+                
+              <div style="clear:left; height:8px;"> </div>
+              <div style="float:left; width:100px;" class="graytxt3"> Marketing <br />
+                Coordinator </div>
+              <?php printRadio("SKILL_B15"); ?>
+                
+              <div style="float:left; width:100px;" class="graytxt3"> Project Mng <br />
+                Web </div>
+              <?php printRadio("SKILL_B85"); ?>
+
+              <div style="clear:left; height:8px;"> </div>
+              <div style="float:left; width:100px;" class="graytxt3"> Marketing <br />
+                Director </div>
+               <?php printRadio("SKILL_B20"); ?>
+              
+              <div style="float:left; width:100px;" class="graytxt3"> Producer Web </div>
+              <?php printRadio("SKILL_B7350"); ?>
+                
+              <div style="clear:left; height:8px;"> </div>
+              <div style="float:left; width:100px;" class="graytxt3"> Media Buyer <br />
+                Broadcast </div>
+                <?php printRadio("SKILL_B2525"); ?>
+              
+              <div style="float:left; width:100px;" class="graytxt3"> Producer Video <br />
+                Broadcast </div>
+              <?php printRadio("SKILL_B7330"); ?>
+                
+
+              <div style="clear:left; height:8px;"> </div>
+              <div style="float:left; width:100px;" class="graytxt3"> Media Buyer <br />
+                Web/Interactive </div>
+              <?php printRadio("SKILL_B2550"); ?>
+                
+             
+              <div style="float:left; width:100px;" class="graytxt3"> Production Mgr </div>
+               <?php printRadio("SKILL_B75"); ?>
+
+              <div style="clear:left; height:8px;"> </div>
+              <div style="float:left; width:100px;" class="graytxt3"> Media Buyer <br />
+                Print </div>
+              <?php printRadio("SKILL_B2575"); ?>
+                
+               
+              <div style="float:left; width:100px;" class="graytxt3"> Print Buyer/ <br />
+                Estimator </div>
+              <?php printRadio("SKILL_B65"); ?>
+                
+             
+              <div style="clear:left; height:8px;"> </div>
+              <div style="float:left; width:100px;" class="graytxt3"> Media Planner <br />
+                Broadcast </div>
+              <?php printRadio("SKILL_B4525"); ?>
+                
+              
+              <div style="float:left; width:100px;" class="graytxt3"> Studio Mng </div>
+              <?php printRadio("SKILL_B90"); ?>
+
+              <div style="clear:left; height:8px;"> </div>
+              <div style="float:left; width:100px;" class="graytxt3"> Media Planner <br />
+                Print </div>
+              <?php printRadio("SKILL_B4575"); ?>
+                
+              
+              <div style="float:left; width:100px;" class="graytxt3"> Traffic Mng</div>
+              <?php printRadio("SKILL_B95"); ?>
+
+
+		<div style="clear:left; height:8px;"> </div>
+              <div style="float:left; width:100px;" class="graytxt3"> Media Planner <br />
+                Web/Interactive </div>
+              <?php printRadio("SKILL_B4550"); ?>
+                
+                            
+              
+            </div>
+          </div>
+          <div style="float:left; padding:25px 0 0 0px;">
+            <div style="float:left;" class="btnbg">
+              <div style="float:left; width:300px;  padding:16px 0 0 60px;"> <a href="#" class="whitetxt1"> languages </a> </div>
+            </div>
+            <div style="clear:left; padding:0px 0 0 70px;">
+              <div style="clear:left; height:20px;"> </div>
+              <div style="float:left; width:100px;" class="graytxt3"> Arabic </div>
+              <?php printRadio("SKILL_T03"); ?>
+                
+              <div style="float:left;  width:100px;" class="graytxt3"> Italian </div>
+              <?php printRadio("SKILL_T35"); ?>
+                
+              <div style="clear:left; height:8px;"> </div>
+              <div style="float:left; width:100px;" class="graytxt3"> Cantonese </div>
+              <?php printRadio("SKILL_T05"); ?>
+             
+              <div style="float:left; width:100px;" class="graytxt3"> Japanese </div>
+               <?php printRadio("SKILL_T40"); ?>
+               
+              <div style="clear:left; height:8px;"> </div>
+              <div style="float:left; width:100px;" class="graytxt3"> Creole </div>
+              <?php printRadio("SKILL_T07"); ?>
+                
+             
+              <div style="float:left; width:100px;" class="graytxt3"> Korean </div>
+               <?php printRadio("SKILL_T45"); ?>
+             
+              <div style="clear:left; height:8px;"> </div>
+              <div style="float:left; width:100px;" class="graytxt3"> English </div>
+              <?php printRadio("SKILL_T15"); ?>
+              
+              <div style="float:left; width:100px;" class="graytxt3"> Mandarin </div>
+              <?php printRadio("SKILL_T50"); ?>
+                
+               
+              <div style="clear:left; height:8px;"> </div>
+              <div style="float:left; width:100px;" class="graytxt3"> Farsi </div>
+              <?php printRadio("SKILL_T17"); ?>
+                
+             
+              <div style="float:left; width:100px;" class="graytxt3"> Portuguese </div>
+               <?php printRadio("SKILL_T55"); ?>
+                
+              
+              <div style="clear:left; height:8px;"> </div>
+              <div style="float:left; width:100px;" class="graytxt3"> French </div>
+               <?php printRadio("SKILL_T20"); ?>
+                
+              
+              <div style="float:left; width:100px;" class="graytxt3"> Russian </div>
+               <?php printRadio("SKILL_T60"); ?>
+                
+              
+              <div style="clear:left; height:8px;"> </div>
+              <div style="float:left; width:100px;" class="graytxt3"> German </div>
+              <?php printRadio("SKILL_T25"); ?>
+                
+              
+              <div style="float:left; width:100px;" class="graytxt3"> Spanish </div>
+              <?php printRadio("SKILL_T65"); ?>
+
+              <div style="clear:left; height:8px;"> </div>
+              <div style="float:left; width:100px;" class="graytxt3"> Hebrew </div>
+              <?php printRadio("SKILL_T27"); ?>
+                
+                
+              <div style="float:left; width:100px;" class="graytxt3"> Swedish </div>
+               <?php printRadio("SKILL_T70"); ?>
+              
+              <div style="clear:left; height:8px;"> </div>
+              <div style="float:left; width:100px;" class="graytxt3"> Hindi </div>
+               <?php printRadio("SKILL_T30"); ?>
+                
+              
+              <div style="float:left; width:100px;" class="graytxt3"> Swahili </div>
+               <?php printRadio("SKILL_T75"); ?>
+                
+            </div>
+          </div>
+          <div style="float:left; padding-top:30px;">
+            <div style="float:left;" class="btnbg">
+              <div style="float:left; padding:16px 0 0 60px;"> <a href="#" class="whitetxt1"> employment info </a> </div>
+            </div>
+            <div style="float:left; padding:20px 0 0 70px;">
+              <div style="float:left;" class="bottomarrow"> I’m available to start: </div>
+              <div style="clear:left; height:1px;"> </div>
+              <div style="float:left; padding:20px 0 0 0px;">
+                <div style="float:left;">
+                  <select id="AVAIL_START_MONTH" name="AVAIL_START_MONTH" class="styled" style=" width:138px;">
+                    <?php MonthOption("AVAIL_START_MONTH", ""); ?>
+                  </select> / 
+                </div>
+                <div style="float:left; padding-left:20px;">
+                  <select id="AVAIL_START_DAY" name="AVAIL_START_DAY" class="styled" style=" width:127px;">
+                    <?php DateOption("AVAIL_START_DAY"); ?>
+                  </select> /
+                </div>
+                <div style="float:left; padding-left:20px;">
+		  <input type="text" id="AVAIL_START_YEAR" name="AVAIL_START_YEAR" placeholder="<?php the_field_value($item_num, "AVAIL_START_YEAR", date("Y") );?>" style="width:200px;"   />
+                </div>
+                <div style="float:left; padding:3px 0px 0 5px;"><img src="https://<?php echo  $_SERVER['SERVER_NAME'] . '/' .  $_SERVER['PATH_INFO'] . $formpath; ?>/images/star_img.png" alt="" /> </div>
+              </div>
+              <div style="clear:left; height:40px;"> </div>
+              <div style="float:left;">
+                <div style="float:left; width:300px;" class="bottomarrow">I’m available these hours: </div>
+                <div style="float:left;" class="bottomarrow"> I can work this many hours: </div>
+              </div>
+              <div style="clear:left; height:1px;"> </div>
+              <div style="float:left; padding-top:15px;">
+                <div style="float:left;">
+                  <select id="AVAIL_HOURS_WEEK" name="AVAIL_HOURS_WEEK" class="styled" style=" width:168px;">
+                        <?php AvailHourOption("AVAIL_HOURS_WEEK", ""); ?>
+                  </select>
+                </div>
+		<div style="float:left; padding-left:15px;">
+                <div style="float:left; padding:3px 10px 0 0px;"> <img src="https://<?php echo  $_SERVER['SERVER_NAME'] . '/' .  $_SERVER['PATH_INFO'] . $formpath; ?>/images/star_img.png" alt="" /> </div>
+                <div style="float:left; width:8px;"> &nbsp; </div>
+                <div style="float:left; padding-left:105px;" >
+                  <select id="AVAIL_SHIFT_WEEKDAY" name="AVAIL_SHIFT_WEEKDAY" class="styled" style=" width:155px;">
+                        <?php AvailTimeOption("AVAIL_SHIFT_WEEKDAY", ""); ?>
+                  </select>
+                </div>
+                <div style="float:left; padding:3px 0px 0 0px;"> <img src="https://<?php echo  $_SERVER['SERVER_NAME'] . '/' .  $_SERVER['PATH_INFO'] . $formpath; ?>/images/star_img.png" alt="" /> </div>
+              </div>
+              <div style="clear:left; height:40px;"> </div>
+              <div style="float:left;">
+                <div style="float:left; width:300px;" class="bottomarrow"> Minimum hourly or yearly pay: </div>
+                <div style="float:left;" class="bottomarrow"> I ‘d like this much notice: </div>
+              </div>
+              <div style="clear:left; padding-top:15px;">
+                <div style="float:left;">
+                  <input type="text" id="AVAIL_MIN_PAY" name="AVAIL_MIN_PAY" placeholder="<?php the_field_value($item_num, "AVAIL_MIN_PAY", "Hourly or yearly pay (no commas or period)");?>" style="width:200px;"  />
+                </div>
+                <div style="float:left; padding:3px 0px 0 8px;"> <img src="https://<?php echo  $_SERVER['SERVER_NAME'] . '/' .  $_SERVER['PATH_INFO'] . $formpath; ?>/images/star_img.png" alt="" /> </div>
+                <div style="float:left; width:91px;"> &nbsp; </div>
+                <div style="float:left;" >
+                  <select id="AVAIL_NOTICE_NEED" name="AVAIL_NOTICE_NEED" class="styled" style=" width:170px;">
+                    <?php NoticePeriodOption("AVAIL_NOTICE_NEED", "");?>
+                  </select>
+                </div>
+                <div style="float:left; padding:3px 0px 0 14px;"> <img src="https://<?php echo  $_SERVER['SERVER_NAME'] . '/' .  $_SERVER['PATH_INFO'] . $formpath; ?>/images/star_img.png" alt="" /> </div>
+              </div>
+              <div style="clear:left; height:40px;"> </div>
+              <div style="float:left;">
+                <div style="float:left; width:300px;" class="bottomarrow">I’m willing to travel: </div>
+                <div style="float:left;" class="bottomarrow"> My personal web link: </div>
+              </div>
+              <div style="clear:left; height:1px;"> </div>
+              <div style="float:left; padding-top:15px;">
+                <div style="float:left;">
+                  <select id="AVAIL_MILES" name="AVAIL_MILES" class="styled" style=" width:172px;">
+                    <?php MilesDistanceOption("AVAIL_MILES", "");?>                    
+                  </select>
+                </div>
+                <div style="float:left; padding:3px 0px 0 14px;"> <img src="https://<?php echo  $_SERVER['SERVER_NAME'] . '/' .  $_SERVER['PATH_INFO'] . $formpath; ?>/images/star_img.png" alt="" /> </div>
+                <div style="float:left; width:1250x;"> &nbsp; </div>
+                <div style="float:left; padding-left:118px;" >
+                  <input type="text" id="EM_HTTP2" name="EM_HTTP2" placeholder="<?php the_field_value($item_num, "EM_HTTP2", "www.MyUrl.com");?>" style="width:200px;"   />
+                </div>
+                <div style="float:left; padding:3px 0px 0 8px;"> <img src="https://<?php echo  $_SERVER['SERVER_NAME'] . '/' .  $_SERVER['PATH_INFO'] . $formpath; ?>/images/star_img.png" alt="" /> </div>
+              </div>
+            </div>
+          </div>
+          <div style="float:left; padding-top:50px;">
+            <div style="float:left;" class="btnbg">
+              <div style="float:left; padding:16px 0 0 60px;"> <a href="#" class="whitetxt1"> resume </a> </div>
+            </div>
+            <div style="float:left; padding:20px 0 0 70px;">
+              <div style="float:left;" class="bottomarrow1"> Upload resume: <span style="color:#231f20">First time in DOC or RTF (Microsoft Word® or Rich Text Format) for our software </span> </div>
+            </div>
+            <div style="clear:left; height:1px;"> </div>
+            <div style="margin:10px 0 0 70px; float:left; background-color:#f9f9f9">
+              <div style="float:left; padding:10px 10px;" >
+                <div style="float:left; padding-left:5px;" class="graytxt1"> <input type="FILE" size="30" name="FILE1" id="FILE1"> </div>
+              </div>
+
+            </div>
+
+            <div style="clear:left; height:1px;"> </div>
+            <div style="float:left; padding-left:70px; height:1px; color:#B22625; font-size:10px;">file name must be under 20 characters; letters &amp; numbers only, no spaces, no dashes, only 1 period</div>
+            <div style="float:right; padding:30px 20px 30px 0;"> 
+        	<input type="image" name="Submit" onclick="return submit_app();" src="https://<?php echo  $_SERVER['SERVER_NAME'] . '/' . $_SERVER['PATH_INFO'] . $formpath; ?>/images/finish_button.jpg" style="height:auto; background-color:#FFF; border:none;">
+		</div>
+
+          </div>
+        </div>
+      </div>
+       
+        <input id="radio_field" name="radio_field" value="<?php echo $radio_field; ?>" type="hidden"/>
+        <input id="cbo_field" name="cbo_field" value="<?php echo $cbo_field; ?>" type="hidden"/>        
+        <input id="text_field" name="text_field" value="<?php echo $text_field; ?>" type="hidden"/>
+	<input id="RMail" name="RMail" value="<?php echo $RMail; ?>" type="hidden"/>
+        <?php save_form_variables();?>
+    </form>
+    </div>
+  </div>

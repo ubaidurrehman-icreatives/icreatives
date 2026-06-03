@@ -1,0 +1,1304 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+?>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta name="description" content="Contact your nearest i creatives office in the LA, San Francisco, Miami, Fort Lauderdale, San Jose, New York City, New Jersey and Atlanta for your creative staffing needs, or for freelance marketing or creative design positions.">
+	<meta name="keywords" content="creative staffing, jobs in marketing, freelance employment, Graphic Designers, Web Designers">
+	
+	<title>i creative staffing login screen</title>
+	
+	  <style>
+	 .lable_class{
+	  font-family: Verdana,Geneva,sans-serif;
+	  font-size: 12px;
+	  color: #6a7785;
+	  line-height: 22px;
+	  margin-left:10px;
+	 }
+	 .contact_input_class{
+	  font-family: Verdana,Geneva,sans-serif;
+	  font-size: 12px;
+	  color: #6a7785;
+	  height: 30px;
+	  width:95%;
+	 }
+	 .contact_input_class1{
+	  font-family: Verdana,Geneva,sans-serif;
+	  font-size: 12px;
+	  color: #6a7785;
+	  height: 30px;
+	  width:20px;
+	 }
+	  .contact_textarea_class{
+	  font-family: Verdana,Geneva,sans-serif;
+	  font-size: 12px;
+	  color: #6a7785;
+	  height: 100px;
+	  width:95%;
+	 }
+	 .Button{
+	padding-top:3px;
+	WIDTH:99%;
+	height:40px; 
+	padding-left: 11px;
+	margin-top: 12px;
+	background-color: #b22625;
+	/*border-radius: 5px;*/
+	color: white;
+	border:none;
+	}
+	input[type=button]
+{
+	-webkit-appearance:none;
+	-webkit-border-radius:0px !important;
+}
+	.outerboxT
+	{
+	position: relative;
+	float: left;
+	width: 100%;
+	height: 71px;
+	background-color: #e5e5e5;
+	  border-top-left-radius: 20px;
+	  border-top-right-radius: 20px;
+	  border-bottom-right-radius: 20px;
+	  margin-top: 7px;
+	}
+	</style>
+	<style>
+	.ontop {
+		/*z-index: 999;*/
+		width: 100%;
+		height: 100%;
+		display: none;
+		position:relative;
+		background-color: rgba(204, 204, 204 0.4);
+		color: #aaaaaa;
+		
+		filter: alpha(opacity = 50);
+	}
+	#popup {
+		width: 200px;
+		/*height: 200px;*/
+		position: absolute;
+		color: #000000;
+		background-color: #ffffff;
+		border: 1px solid #666;
+		/* To align popup window at the center of screen*/
+		top: 50%;
+		left: 50%;
+		margin-top: -100px;
+		margin-left: -150px;
+	}
+	select {
+		border: solid 1px #ccc;
+	/*	border-radius: 10px;
+		-moz-border-radius: 10px;
+		-webkit-border-radius: 10px;*/
+		height: 25px;
+		width: 50px;
+	}
+	.text1 {
+	border:2px solid #b3b3b3;
+	background:#fff;
+	width:50px;
+	height: 22px;
+	border-radius:25px;
+	-moz-border-radius:25px; 
+	-moz-box-shadow:    1px 1px 1px #ccc;
+	-webkit-box-shadow: 1px 1px 1px 1px #ccc;
+	 box-shadow:         1px 2px 2px 2px #ccc;
+	
+	}
+	.Button1{
+	/*padding-top:3px;*/
+	WIDTH:45%;
+	height:30px; 
+	/*padding-left: 11px;*/
+	/*margin-top: 12px;*/
+	background-color: #b22625;
+	/*border-radius: 5px;*/
+	color: white;
+	border:0px;
+	border:none;
+	
+	}
+	</style>
+	<script type="text/javascript">
+
+				function pop(div) {
+					document.getElementById(div).style.display = 'block';
+				}
+				function hide(div) {
+					document.getElementById(div).style.display = 'none';
+				}
+				//To detect escape button
+				document.onkeydown = function(evt) {
+					evt = evt || window.event;
+					if (evt.keyCode == 27) {
+						hide('popDiv');
+					}
+				};
+			
+		  </script>
+
+
+    <link href="/webtime/css/mobile/styles.css" rel="stylesheet" type="text/css" />
+  <!--   <link rel="stylesheet" type="text/css" href="/webtime/css/css.css" /> -->
+	
+		<script type="text/javascript" src="/webtime/css/js.js"></script>
+		<script type="text/javascript" src="/webtime/css/js/jquery.js"></script>
+		<script type="text/javascript" src="/webtime/css/custom-form-elements.js"></script>
+		
+	
+	
+	<script type="text/javascript">
+	
+	function submitform()
+	{
+		document.form.submit();
+		//document.forms["webtime"].submit();
+		//if (validateFields()==true)	
+		//{	
+		//	document.forms["webtime"].submit();
+		//}
+		
+	}
+	</script>
+</head>
+<body>
+	
+	<?php
+	Function TotalHrs($i) {
+	
+	$TotalHrs = $row["OUTHR" . $i] - $row["INHR" . $i] - $row["BREAK" . $i];
+	
+	return $TotalHrs;
+	} 
+	
+	Function DecToTime($Hrs) {
+	$Hrs = str_pad(floor($Hrs),2,"0", STR_PAD_LEFT) . ":" . str_pad(round(($Hrs - floor($Hrs))*60,0),2,"0", STR_PAD_LEFT) ;
+
+	return $Hrs;
+}
+?>
+	<script language="JavaScript">
+	function validateFields()
+	
+	{
+		//	check for missing in or out
+		var gt = 0;
+		var sInHours;
+		var sInMinutes;
+		var  sInAmPm;
+		var sOutHours;
+		var sOutMinutes;
+		var sOutAmPm;
+		var sBreakHr;
+		var sBreakMin;
+		var sm;
+		var sap;
+		var fm;
+		var fap;
+		var totalhour=0;
+		for (i=1; i<=7; i++)
+		{
+		
+			var daily = 0;
+			var sh = [];
+			var fh=[];
+			var bh=[];
+			var bm=[];
+			sh[i]=document.getElementById("TimeInHr"+i+"").value;
+			// eval("var sh"+i"= document.getElementById('TimeInHr"+i+"').value;")
+			//eval("var sm"+i+" 	= document.forms[0].TimeInMin"+i+".value;")
+			eval("var sap"+i+" 	= document.forms[0].TimeInAmPm"+i+".value;")
+			fh[i]=document.getElementById("TimeOutHr"+i+"").value;		
+			// eval("var fh"+i" 	= document.getElementById(TimeOutHr"+i+").value;")
+		//	eval("var fm"+i+" 	= document.forms[0].TimeOutMin"+i+".value;")
+			//eval("var fap"+i+" 	= document.forms[0].TimeOutAmPm"+i+".value;")
+             bh[i]=document.getElementById("BreakHr"+i+"").value;			
+		///	eval("var bh"+i+" 	= document.getElementById('BreakHr"+i+"').value;")
+			//bm[i]=document.getElementById("BreakMin"+i+"").value;
+		///	eval("var bm"+i+" 	= document.getElementById('BreakMin"+i+"').value;")	
+		//	gt = gt + sh[i] + fh[i];
+			gt=gt+Converttimeformat1(i);
+			
+				//  check for time-in = 0 or time out = 0 but not both
+				if ((sh[i] == "00:00:00" && fh[i] != "00:00:00") || (fh[i]== "00:00:00" && sh[i] != "00:00:00" ))
+	
+				{
+				alert("\nYour Time-In cannot be Zero if Time Out is not Zero");
+	//			eval('alert("\n' + dayOfWeek[i+1] + ': Your Time-In cannot be Zero if Time Out is not Zero");')
+				
+			//	eval("document.forms[0].TimeInHr" + i +".select();")
+				document.getElementById("TimeInHr"+i+"").focus();
+				//eval("document.forms[0].TimeInHr" + i +".focus();")		
+				return false;
+				}
+					
+				// check for PM to AM	
+		/*		if ( (eval('sap'+i) == "PM") && (eval('fap'+i) == "AM") )
+				{
+					alert("You cannot go from PM to AM please use a fax timesheet.");
+					eval("document.forms[0].TimeInHr" + i +".select();")
+					eval("document.forms[0].TimeInHr" + i +".focus();")	
+				return (false);
+				}					
+						*/	
+				// check for not a number
+			/*	if (!IsNumeric(eval('sh'+i)) || !IsNumeric(eval('fh'+i)) )
+				// || len(eval('sh'+i))==0 || len(eval('fh'+i)) ==0 )
+				{
+					alert("One of the Hour of Day fields is blank or not a number.");
+					eval("document.forms[0].TimeInHr" + i +".select();")
+					eval("document.forms[0].TimeInHr" + i +".focus();")	
+				return (false);
+				}		*/
+	
+			/*	// check time in = time out
+				if ( eval('sh'+i) == eval('fh'+i)  && eval('sm'+i) == eval('fm'+i) && eval('sh'+i) != 0 && eval('fh'+i) != 0 && eval('sap'+i) == eval('fap'+i) )
+				{
+					alert(eval('fap'+i) +"=="+ eval('sap'+i) + " Time In Equals Time Out.");
+					eval("document.forms[0].TimeInHr" + i +".select();")
+					eval("document.forms[0].TimeInHr" + i +".focus();")	
+				return (false);
+				}		
+	
+	
+				// check for numbers over 12
+				if ( sh[i] > 12 || fh[i]> 12 )
+				{
+					alert("One of the Hour of Day fields is over 12.");
+					eval("document.forms[0].TimeInHr" + i +".select();")
+					eval("document.forms[0].TimeInHr" + i +".focus();")	
+				return (false);
+				}	*/	
+				
+			if ( sh[i] == "00:00:00" || fh[i] == "00:00:00" )
+				{
+					if(bh[i] != "00:00")
+					{
+					alert("Please do not enter only break hour.");
+					//document.getElementById("BreakHr"+i+"")..select();
+					document.getElementById("BreakHr"+i+"").focus();					
+					return false;
+					}
+				
+				}		
+				
+				
+				
+		
+	
+	
+			
+			// check for not Null
+		/*		if ( sh[1] =="" && fh[1] == "" )
+				// || len(eval('sh'+i))==0 || len(eval('fh'+i)) ==0 )
+				{
+					alert("One of the Hour of Day fields is blank or not a number.");
+					eval("document.forms[0].TimeInHr" + i +".select();")
+					eval("document.forms[0].TimeInHr" + i +".focus();")	
+				return (false);
+				}		*/
+	
+	
+						
+			// check for minimum hours
+		/*	sInHours = Number(eval('sh' +i));				    
+			if (eval('sap'+i)=='PM' && sInHours < 12)
+			{
+				sInHours = sInHours + 12;
+			}    
+			//12am
+			if (eval('sap'+i)=='AM' && sInHours == 12)
+			{
+				sInHours = 0;
+			}		
+			sInMinutes = Number(eval('sm'+i))/60;    	
+			sOutHours = Number(eval('fh'+i));
+			 if (eval('fap'+i)=='PM' && Number(eval('fh'+i))>0 && Number(eval('fh'+i))<12)
+			 {
+				sOutHours = sOutHours + 12;
+			 } 
+		 
+			if (eval('fap'+i)=='AM' && eval('sap'+i)=='AM' && Number(eval('sh'+i))== 12 && Number(eval('fh'+i)) > 0 && Number(eval('fh'+i)) < 12 )
+			{
+				sInHours = 0;
+			}
+			
+			sOutMinutes = Number(eval('fm'+i))/60;
+			sBreakHr = Number(eval('bh'+i));
+			sBreakMin = Number(eval('bm'+i))/60;
+		
+		
+		
+			daily= (Number(eval(sOutMinutes)) + Number(eval(sOutHours))) - (Number(eval(sInMinutes)) + Number(eval(sInHours)) ) -(Number(eval(sBreakHr)) + Number(eval(sBreakMin)));
+		
+				// check for negative hours
+				if (daily < 0)
+				{
+					alert(" You have Negative or Zero Hours.");
+					eval("document.forms[0].TimeInHr" + i +".select();")
+					eval("document.forms[0].TimeInHr" + i +".focus();")	
+					return false;						
+				}
+				 if (daily > 0 && daily < 4)
+				 {			
+				 	var answer = confirm(" There is a minimum on-site hourly charge of 4 hours. If you want do not want to waive this, please press edit on the next screen ");
+				 	if (!answer){
+					return true;
+					}	
+				}
+			
+			
+				*/
+	
+			// check for no Hours	
+				if ( i >= 7 && gt == 0 )
+				{
+					alert("No Hours Were Entered.");
+					//document.forms[0].TimeInHr1.select();
+					document.forms[0].TimeInHr1.focus();	
+				   return false;
+				}		
+				
+	
+			
+			// is the continuing radio button checked		
+				
+											
+										
+			}
+		var totalhour=totalSeconds(gt);
+		//alert(totalSeconds(gt));
+			// if(totalhour < 4)
+			// {
+			// alert("There is a minimum on-site hourly charge of 4 hours. If you want do not want to waive this, please press edit on the next screen.");
+			// return false;
+			// }
+
+	     var radioSelected = false;
+				for (x = 0;  x < document.forms[0].Continuing.length;  x++)
+				{
+				if (document.forms[0].Continuing[x].checked)
+				
+				 radioSelected = true;
+				}
+				if (!radioSelected)
+				{
+					alert("Please select one of the \"Assignment continuing\" options.");
+					//document.forms[0].TimeInHr1.select();
+					document.forms[0].TimeInHr1.focus();
+				return false;
+				}	
+		
+			return true;
+	}		
+	
+ function totalSeconds (sec) {
+  var hours   = Math.floor(sec / 3600);
+  var minutes = Math.floor((sec - (hours * 3600)) / 60);
+  var seconds = sec - (hours * 3600) - (minutes * 60);
+
+  // round seconds
+  seconds = Math.round(seconds * 100) / 100
+
+  var result = (hours < 10 ? "0" + hours : hours);
+     // result += ":" + (minutes < 10 ? "0" + minutes : minutes);
+ //     result += ":" + (seconds  < 10 ? "0" + seconds : seconds);
+  return result;
+}
+	
+	
+	
+	function TotalDailyCal_All()
+	{
+	
+		Converttimeformat(1);
+		Converttimeformat(2);
+		Converttimeformat(3);
+		Converttimeformat(4);
+		Converttimeformat(5);
+		Converttimeformat(6);
+		Converttimeformat(7);
+		
+	}
+	
+	function setdefaultvalue(i)
+	{
+	
+	if (document.getElementById("TimeInHr"+i+"").value=="00:00:00")
+	{
+	
+	document.getElementById("TimeInHr"+i+"").value="09:00";
+	}
+	if (document.getElementById("TimeOutHr"+i+"").value=="00:00:00")
+	{
+	
+	document.getElementById("TimeOutHr"+i+"").value="18:00";
+	}
+	}
+	function Converttimeformat1(i) {
+// var time = $("#starttime").val();
+
+
+var time = document.getElementById("TimeInHr"+i+"").value;
+var hrs = Number(time.match(/^(\d+)/)[1]);
+var mnts = Number(time.match(/:(\d+)/)[1]);
+/*var format = time.match(/\s(.*)$/)[1];
+if (format == "PM" && hrs < 12) hrs = hrs + 12;
+if (format == "AM" && hrs == 12) hrs = hrs - 12;*/
+var hours =hrs.toString();
+var minutes = mnts.toString();
+/*if (mnts <= 10 ) minutes=0;
+if (mnts > 10  && mnts <= 25) minutes=15;
+if (mnts > 25  && mnts <= 40) minutes=30;
+if (mnts > 40  && mnts <= 55) minutes=45;
+if (mnts > 55 ) minutes=60;*/
+if (hrs < 10) hours = "0" + hours;
+if (mnts < 10) minutes = "0" + minutes;
+//alert(hours + ":" + minutes);
+
+ var date1 = new Date();
+date1.setHours(hours );
+date1.setMinutes(minutes);
+//alert(date1);
+
+var time = document.getElementById("TimeOutHr"+i+"").value;
+var hrs = Number(time.match(/^(\d+)/)[1]);
+var mnts = Number(time.match(/:(\d+)/)[1]);
+/*var format = time.match(/\s(.*)$/)[1];
+if (format == "PM" && hrs < 12) hrs = hrs + 12;
+if (format == "AM" && hrs == 12) hrs = hrs - 12;*/
+var hours = hrs.toString();
+var minutes = mnts.toString();
+/*if (mnts < 10 ) minutes=0;
+if (mnts >= 10  && mnts < 25) minutes=15;
+if (mnts >= 25  && mnts < 40) minutes=30;
+if (mnts >= 40  && mnts < 55) minutes=45;
+if (mnts >= 55 ) minutes=60;*/
+if (hrs < 10) hours = "0" + hours;
+if (mnts < 10) minutes = "0" + minutes;
+//alert(hours+ ":" + minutes);
+var date2 = new Date();
+date2.setHours(hours );
+date2.setMinutes(minutes);
+//alert(date2);
+//var bh=document.getElementById("BreakHr"+i+"").value;
+var time=document.getElementById("BreakHr"+i+"").value;
+
+var hrs = Number(time.match(/^(\d+)/)[1]);
+var mnts = Number(time.match(/:(\d+)/)[1]);
+var bh=(hrs * (1000 * 60 * 60));
+var bm=(mnts*(1000 * 60));
+var totalBreak=bh+bm;
+//eval("var bh 	= document.forms[0].BreakHr"+i+".value;")
+//eval("var bm 	= document.forms[0].BreakMin"+i+".value;")
+
+var diff = (date2.getTime() - date1.getTime()) ;
+
+
+diff=diff-totalBreak;
+
+var hours = Math.floor(diff / (1000 * 60 * 60));
+diff -= hours * (1000 * 60 * 60);
+
+var mins = Math.floor(diff / (1000 * 60));
+diff -= mins * (1000 * 60);
+if (mins<10)
+{
+mins = "0" + mins;
+}
+if (hours < 0)
+{
+hours=0;
+}
+//alert( hours + " hours : " + mins + " minutes : " );
+return getTimeAsSeconds(hours + ":" + mins);	
+}
+	
+	
+	
+	function getTimeAsSeconds(time){
+    var timeArray = time.split(':');
+    return (Number(timeArray [0]) * 3600) + (Number(timeArray [1]) * 60 );
+}
+	
+function Converttimeformat(i) {
+// var time = $("#starttime").val();
+
+
+var time = document.getElementById("TimeInHr"+i+"").value;
+var hrs = Number(time.match(/^(\d+)/)[1]);
+var mnts = Number(time.match(/:(\d+)/)[1]);
+/*var format = time.match(/\s(.*)$/)[1];
+if (format == "PM" && hrs < 12) hrs = hrs + 12;
+if (format == "AM" && hrs == 12) hrs = hrs - 12;*/
+var hours =hrs.toString();
+var minutes = mnts.toString();
+/*if (mnts <= 10 ) minutes=0;
+if (mnts > 10  && mnts <= 25) minutes=15;
+if (mnts > 25  && mnts <= 40) minutes=30;
+if (mnts > 40  && mnts <= 55) minutes=45;
+if (mnts > 55 ) minutes=60;*/
+if (hrs < 10) hours = "0" + hours;
+if (mnts < 10) minutes = "0" + minutes;
+//alert(hours + ":" + minutes);
+
+ var date1 = new Date();
+date1.setHours(hours );
+date1.setMinutes(minutes);
+//alert(date1);
+
+var time = document.getElementById("TimeOutHr"+i+"").value;
+var hrs = Number(time.match(/^(\d+)/)[1]);
+var mnts = Number(time.match(/:(\d+)/)[1]);
+/*var format = time.match(/\s(.*)$/)[1];
+if (format == "PM" && hrs < 12) hrs = hrs + 12;
+if (format == "AM" && hrs == 12) hrs = hrs - 12;*/
+var hours = hrs.toString();
+var minutes = mnts.toString();
+/*if (mnts < 10 ) minutes=0;
+if (mnts >= 10  && mnts < 25) minutes=15;
+if (mnts >= 25  && mnts < 40) minutes=30;
+if (mnts >= 40  && mnts < 55) minutes=45;
+if (mnts >= 55 ) minutes=60;*/
+if (hrs < 10) hours = "0" + hours;
+if (mnts < 10) minutes = "0" + minutes;
+//alert(hours+ ":" + minutes);
+var date2 = new Date();
+date2.setHours(hours );
+date2.setMinutes(minutes);
+//alert(date2);
+//var bh=document.getElementById("BreakHr"+i+"").value;
+var time=document.getElementById("BreakHr"+i+"").value;
+
+var hrs = Number(time.match(/^(\d+)/)[1]);
+var mnts = Number(time.match(/:(\d+)/)[1]);
+var bh=(hrs * (1000 * 60 * 60));
+var bm=(mnts*(1000 * 60));
+var totalBreak=bh+bm;
+//eval("var bh 	= document.forms[0].BreakHr"+i+".value;")
+//eval("var bm 	= document.forms[0].BreakMin"+i+".value;")
+
+var diff = (date2.getTime() - date1.getTime()) ;
+
+
+diff=diff-totalBreak;
+
+var hours = Math.floor(diff / (1000 * 60 * 60));
+diff -= hours * (1000 * 60 * 60);
+
+var mins = Math.floor(diff / (1000 * 60));
+diff -= mins * (1000 * 60);
+if (mins<10)
+{
+mins = "0" + mins;
+}
+if (hours < 0)
+{
+hours=0;
+}
+if (document.getElementById("TimeInHr"+i+"").value!="")
+{
+var fromvalue=document.getElementById("TimeInHr"+i+"").value;
+var From = "From "+ ampm(fromvalue);
+}
+if (document.getElementById("TimeOutHr"+i+"").value!="")
+{
+var tovalue=document.getElementById("TimeOutHr"+i+"").value;
+var To = "To "+ ampm(tovalue);
+
+}
+
+var Lunch = "Lunch "+document.getElementById("BreakHr"+i+"").value +"Hrs";
+//alert( hours + " hours : " + mins + " minutes : " );
+document.getElementById("TotalDaily"+i+"").innerHTML = hours + ":" + mins +" hrs";	
+if (document.getElementById("TimeInHr"+i+"").value!="00:00:00")
+{
+document.getElementById("divFrom"+i+"").innerHTML = From;
+}
+if (document.getElementById("TimeOutHr"+i+"").value!="00:00:00")
+{
+document.getElementById("divLunch"+i+"").innerHTML = Lunch;
+}
+if(document.getElementById("BreakHr"+i+"").value!="00:00")
+{
+document.getElementById("divTo"+i+"").innerHTML = To;
+}
+}
+	function ampm(time) {
+
+ // console.log(time);
+  if (time.value !== "") {
+    var hours = time.split(":")[0];
+    var minutes = time.split(":")[1];
+    var suffix = hours >= 12 ? "pm" : "am";
+    hours = hours % 12 || 12;
+    hours = hours < 10 ? "0" + hours : hours;
+
+    var displayTime = hours + ":" + minutes + " " + suffix;
+   return displayTime;
+  }
+}
+	function TotalDailyCal(i)
+	{
+		//	check for missing in or out
+	
+		var gt = 0;
+		var err_num=0;
+		var sInHours;
+		var sInMinutes;
+		var sInAmPm;
+		var sOutHours;
+		var sOutMinutes;
+		var sOutAmPm;
+		var sBreakHr;
+		var sBreakMin;
+	
+		eval("var sh 	= document.forms[0].TimeInHr"+i+".value;")
+		//eval("var sm 	= document.forms[0].TimeInMin"+i+".value;")
+		//eval("var sap 	= document.forms[0].TimeInAmPm"+i+".value;")		
+		eval("var fh 	= document.forms[0].TimeOutHr"+i+".value;")
+		//eval("var fm 	= document.forms[0].TimeOutMin"+i+".value;")
+		//eval("var fap 	= document.forms[0].TimeOutAmPm"+i+".value;")	
+		eval("var bh 	= document.forms[0].BreakHr"+i+".value;")
+		eval("var bm 	= document.forms[0].BreakMin"+i+".value;")
+		
+		gt = gt + eval('sh') + eval('fh');
+	
+			//  check for time-in = 0 or time out = 0 but not both
+				if ((eval('sh') == "0" && eval('fh') != "0") || (eval('fh')== "0" && eval('sh') != "0" ))
+				{
+					eval("document.getElementById('TotalDaily" + i+"').innerHTML = 0");	
+					eval("document.forms[0].TimeInHr" + i +".select();")
+					eval("document.forms[0].TimeInHr" + i +".focus();")		
+					return false;
+				}
+					
+				// check for PM to AM	
+				//Buu added 12am
+				if ( (eval('sap') == "PM") && (eval('fap') == "AM")  && eval('sh') != "12")
+				{
+					eval("document.getElementById('TotalDaily" + i+"').innerHTML = 0");	
+					eval("document.forms[0].TimeInHr" + i +".select();")
+					eval("document.forms[0].TimeInHr" + i +".focus();")	
+					return (false);
+				}					
+							
+				// check for not a number
+				if (!IsNumeric(eval('sh')) || !IsNumeric(eval('fh')) )
+				// || len(eval('sh'+i))==0 || len(eval('fh'+i)) ==0 )
+				{
+					eval("document.getElementById('TotalDaily" + i+"').innerHTML = 0");	
+					eval("document.forms[0].TimeInHr" + i +".select();")
+					eval("document.forms[0].TimeInHr" + i +".focus();")	
+					return (false);
+				}		
+	
+				// check time in = time out
+				if ( eval('sh') == eval('fh')  && eval('sm') == eval('fm') && eval('sh') != 0 && eval('fh') != 0 && eval('sap') == eval('fap') )
+				{
+					eval("document.getElementById('TotalDaily" + i+"').innerHTML = 0");	
+					eval("document.forms[0].TimeInHr" + i +".select();")
+					eval("document.forms[0].TimeInHr" + i +".focus();")	
+					return (false);
+				}		
+	
+	
+			// check for numbers over 12
+				if ( eval('sh') > 12 || eval('fh')> 12 )
+				{
+					eval("document.getElementById('TotalDaily" + i+"').innerHTML = 0");	
+					eval("document.forms[0].TimeInHr" + i +".select();")
+					eval("document.forms[0].TimeInHr" + i +".focus();")	
+					return (false);
+				}
+	
+			
+			// check for not Null
+				if ( eval('sh') =="" && eval('fh')== "" )
+				// || len(eval('sh'+i))==0 || len(eval('fh'+i)) ==0 )
+				{
+					eval("document.forms[0].TotalDaily" + i +".value=0" );
+					eval("document.forms[0].TimeInHr" + i +".select();")
+					eval("document.forms[0].TimeInHr" + i +".focus();")	
+					return (false);
+				}		
+	
+			// check for no Hours	
+				if ( i >= 7 && gt == 0 )
+				{
+					eval("document.getElementById('TotalDaily" + i+"').innerHTML = 0");	
+					document.forms[0].TimeInHr1.select();
+					document.forms[0].TimeInHr1.focus();	
+				   return (false);
+				}		
+				
+	
+			//End of validate - start calcualte total hours   
+			sInHours = Number(eval('sh'));
+						
+			if (eval('sap')=='PM' && sInHours < 12)
+			{
+				sInHours = sInHours + 12;
+			}    
+			//12am
+			if (eval('sap')=='AM' && sInHours == 12)
+			{
+				sInHours = 0;
+			}
+			
+			sInMinutes = Number(eval('sm'))/60;    	
+		
+			sOutHours = Number(eval('fh'));
+		
+			 if (eval('fap')=='PM' && Number(eval('fh'))>0 && Number(eval('fh'))<12)
+			 {
+				sOutHours = sOutHours + 12;
+			 } 
+		 
+			if (eval('fap')=='AM' && eval('sap')=='AM' && Number(eval('sh'))== 12 && Number(eval('fh')) > 0 && Number(eval('fh')) < 12 )
+			{
+				sInHours = 0;
+			}
+			
+			sOutMinutes = Number(eval('fm'))/60;
+			sBreakHr = Number(eval('bh'));
+			sBreakMin = Number(eval('bm'))/60;
+		
+			var daily_conv = (Number(eval(sOutMinutes)) + Number(eval(sOutHours))) - (Number(eval(sInMinutes)) + Number(eval(sInHours)) ) -(Number(eval(sBreakHr)) + Number(eval(sBreakMin)));
+			
+			//set final total value
+			eval("document.getElementById('TotalDaily" + i+"').innerHTML = " + daily_conv);	
+		
+			return true;
+			}		
+	
+	function CLearText(i)
+	{
+	document.getElementById("TimeInHr"+i+"").value="00:00:00";
+	document.getElementById("TimeOutHr"+i+"").value="00:00:00";
+	document.getElementById("BreakHr"+i+"").value="00:00";
+	var From = "From: 00:00 ";
+var To = "To: 00:00";
+var Lunch = "Lunch: 00:00";
+//alert( hours + " hours : " + mins + " minutes : " );
+document.getElementById("TotalDaily"+i+"").innerHTML = "0:00 hrs";	
+document.getElementById("divFrom"+i+"").innerHTML = From;
+document.getElementById("divLunch"+i+"").innerHTML = Lunch;
+document.getElementById("divTo"+i+"").innerHTML = To;
+	}			 
+	</script>
+	
+	
+	
+<?php
+$test = $_Request["Assignment"] ?? 0;
+require_once __DIR__ . '/../db/db.php';
+$link = db();   
+// $link = mysqli_connect('localhost', 're0nm8', '50h8r6WNvB!ozVY2','ck3b2t') or die("Error: " . mysqli_error());
+
+if (strlen($test) > 1) { $i = 1; } 
+
+$lsNewWeb = "False";
+
+Function HrComp($lsHr) {
+If ($lsHr >= 13) {
+   $lsHr = intval($lsHr -12);
+ }Else {
+   $lsHr = intval($lsHr);
+ }
+ 
+return $lsHr;
+}
+
+Function HrComp1($lsHr) {
+	
+	if ($lsHr < 12) {
+   		$HrComp1 = intval($lsHr);
+ 	}
+	if ($lsHr == 12) {
+   		$HrComp1 = intval($lsHr);
+	}
+ 	if ($lsHr > 12) {
+   		$HrComp1 = intval($lsHr) - 12;
+	}
+	IF (strLEN($HrComp1) < 2) {
+		$HrComp1 = "0" . $HrComp1;
+	}
+	return $HrComp1 ;
+}
+
+
+Function AmPmCompIn($lsHr) { // need two because out should default to PM for new record
+If ($lsHr >= 12) {
+        $AmPmCompIn = "<option class='defaulttable' value = 'AM'>AM</option> <option value='PM' selected>PM</option>";
+} Else {
+        $AmPmCompIn = "<option value='AM' selected>AM</option> <option value='PM'>PM</option>";
+}
+return $AmPmCompIn;
+}
+
+Function AmPmCompOut($lsHr) {
+If ($lsHr >= 12 || $lsHr == 0) {
+        $AmPmCompOut = "<option value = 'AM'>AM</option> <option value = 'PM' selected>PM</option>";
+} Else {
+        $AmPmCompOut = "<option value = 'AM' selected>AM</option> <option value = 'PM'>PM</option>";
+}
+return $AmPmCompOut;
+}
+
+Function AmPmCompOut1($lsHr) {
+If ($lsHr >= 12 || $lsHr == 0) {
+	$AmPmCompOut1 = "PM";
+} Else {
+	$AmPmCompOut1 = "AM";
+}
+return $AmPmCompOut1;
+}
+
+Function AmPmComp($lsHr) {
+    // If the hour is exactly 12, it should be PM
+    if ($lsHr >= 0 || $lsHr < 12) {
+        $AmPmComp = "AM";
+    } else {
+        $AmPmComp = "PM";
+    }
+    return $AmPmComp;
+}
+
+
+
+
+function truncate($value, $precision) {
+    $multiplier = pow(10, $precision);
+    $value = (int)($value * $multiplier);
+    return $value / $multiplier;
+}
+
+Function MinComp($lsHr) {
+
+$lsMin = ($lsHr - floor($lsHr)) * 60;
+
+Switch ($lsMin) {
+
+Case 0:
+$MinComp = "<option selected='Yes' value=0>00</option> <option value=15>15</option> <option value=30>30</option> <option value=45>45</option>";
+break;        
+Case 15:
+$MinComp = "<option value=0>00</option> <option selected='Yes' value=15>15</option> <option value=30>30</option> <option value=45>45</option>";
+break; 
+Case 30:
+$MinComp = "<option value=0>00</option> <option value=15>15</option> <option selected='Yes' value=30>30</option> <option value=45>45</option>";
+break; 
+Case 45:
+$MinComp = "<option value=0>00</option> <option value=15>15</option> <option value=30>30</option> <option selected='Yes' value=45>45</option>";
+break; 
+default:
+$MinComp = "<option value=0>00</option> <option value=15>15</option> <option value=30>30</option> <option value=45>45</option>";
+break; 
+}
+return $MinComp;
+}
+	
+	Function MinComp1($lsHr) {
+	$MinComp1 = round(($lsHr - round($lsHr,0))*60,0);
+	If ($MinComp1 < 10) {
+		$MinComp1 = "0" . $MinComp1;
+	}
+	If ($MinComp1 == 0) {
+//		$MinComp1 = "00" . $MinComp1;
+	}
+
+	 return 	$MinComp1;
+
+	}
+		
+
+$Contractor_ID = $_REQUEST["Contractor_ID"];
+$PassThru = $_REQUEST["Assignment"];
+
+$lsAssignment_ID = (SubStr($PassThru,0,strpos($PassThru,"|")));
+
+// echo "assignment_id - " . $lsAssignment_ID ."<br>";
+
+// echo "time: = " . Substr($PassThru,strpos($PassThru,"|")+1) . "<br>";
+
+$lsWeekEnd = date("Y-m-d", strtotime(Substr($PassThru,strpos($PassThru,"|")+1)));
+
+// echo "weekend - " . $lsWeekEnd ."xxxx<br>";
+
+$strSQL = "SELECT 'TIMEACT' as '!TIMEACT' ";
+$strSQL = $strSQL . ", wt.first_name as FIRST ";
+$strSQL = $strSQL . ", wt.last_name as LAST ";
+// $strSQL = $strSQL . ", REPLACE((oj.last_name+ ' ' +oj.first_name),' ','_') as EMP ";
+// $strSQL = $strSQL . ", convert(varchar(12),(SELECT DATEADD(day, DATEDIFF(day,0 , GETDATE()) - (DATEDIFF(day,  6,  GETDATE()) % 7), 0)),101) as DATE ";
+$strSQL = $strSQL . ", REPLACE(oj.company_name,' ','_') as JOB ";
+// $strSQL = $strSQL . ", REPLACE(em.PostalCode,' ','_') as ZIP ";
+$strSQL = $strSQL . ", oj.job_name as ITEM ";
+$strSQL = $strSQL . ", '-' as NOTE, oj.job as PROJ ";
+$strSQL = $strSQL . ", oj.job as xORDER ";
+// $strSQL = $strSQL . ", oj.Primary_Contact_ID as ORDERTAKENID ";
+// $strSQL = $strSQL . ", oj.Second_Contact_ID as REPORTID ";
+// $strSQL = $strSQL . ", oj.Second_Contact_ID as SUPERVISORID ";
+// $strSQL = $strSQL . ", oj.Branch_ID as BRANCH ";
+// $strSQL = $strSQL . ", om.Division_ID as DIVISION ";
+// $strSQL = $strSQL . ", om.UserDefined2 as ALTEMPMAIL ";
+$strSQL = $strSQL . ", '40' as DURATION ";
+$strSQL = $strSQL . ", '1' as BILLINGSTATUS ";
+$strSQL = $strSQL . ", 'CONTR' as PITEM ";
+// $strSQL = $strSQL . ", ctm.First_Name + ' ' + ctm.Last_Name as SUPERVISOR ";
+$strSQL = $strSQL . ", '0' as BITEM ";
+$strSQL = $strSQL . ", oj.po_number as PO ";
+// $strSQL = $strSQL . ", om.BillingProfileKey as BILLINGPROFILE ";
+// $strSQL = $strSQL . ", ctm.EMAIL_Address_1 as INVMETHOD "; // First Userdefined field in the additional tab in contact master
+// $strSQL = $strSQL . ", bp.UserDefined3 as ALTETIME ";
+// $strSQL = $strSQL . ", bp.UserDefined2 as ALTETIME2 ";
+// $strSQL = $strSQL . ", bp.UserDefined1 as AcctEmail ";
+$strSQL = $strSQL . ", 'Yes' as Contract ";
+
+for ($i = 1; $i <= 7; $i++) {
+
+ 	$strSQL = $strSQL . ", wt.TimeInHr" . $i . " as INHR" . $i . " ";
+	$strSQL = $strSQL . ", wt.TimeOutHr" . $i . " as OUTHR" . $i . " ";
+	$strSQL = $strSQL . ", wt.Break" . $i . " as BREAK" . $i . " ";
+}
+$strSQL = $strSQL . ", wt.Continuing as CONT " ;
+$strSQL = $strSQL . ", wt.ApproveDate as APPROVE " ;
+$strSQL = $strSQL . ", wt.SentDate as SENT " ;
+$strSQL = $strSQL . ", wt.DeclineDate as DECLINE " ;
+$strSQL = $strSQL . "from ic_timesheets wt ";
+$strSQL = $strSQL . "JOIN ic_matches oj on oj.candidate = wt.Employee_ID";
+$strSQL = $strSQL . " WHERE wt.void = FALSE AND wt.Assignment_ID = '" .  $lsAssignment_ID . "' AND wt.weekending = '" . $lsWeekEnd ."' ";
+$strSQL = $strSQL . " AND wt.Employee_ID='" . $Contractor_ID . "' ";
+$strSQL = $strSQL . " ORDER BY PROJ ";
+
+
+// echo "<br>" . $strSQL;
+
+// $strSQL = "SELECT * from  ic_webtime WHERE wt.Employee_ID = '".$Contractor_ID."' AND wt.Assignment_ID = '".$lsAssignment_ID."' AND weekending = '" . $lsWeekEnd ."' ";
+$strOK = True;		  
+$resMySel2 = mysqli_query($link,$strSQL );	
+$count = mysqli_num_rows($resMySel2);
+$row = mysqli_fetch_array($resMySel2);	
+
+// echo "<br>" . $strSQL;
+
+	// check to see if it is OK to edit, if back button was click twice
+
+	//  test if back button was hit a couple of times with approve
+if ( ((($row['APPROVE'] ?? null) === null) && (($row['SENT'] ?? null) === null)) || (($row['DECLINE'] ?? null) !== null) ) {
+   		$strOK = True;
+	} else {
+   		$strOK = False;
+   		echo("<P><BR><BR><P> <CENTER><H1><B> Timesheet was already sent for approval</B></H1> </CENTER>");
+	}
+
+/*
+if (Is_Null($row["PROJ"]) ) {
+}
+*/
+
+	$strSQLz = "SELECT * FROM ic_matches WHERE job = '" . $lsAssignment_ID . "' AND candidate = '" . $Contractor_ID . "'";
+ echo $strSQLz;
+	$resultz = mysqli_query($link,$strSQLz);
+	$countz = mysqli_num_rows($resultz);
+	$rowz = mysqli_fetch_array($resultz);	
+
+	$PROJ = $rowz["job"] ?? '';
+	$JOB = $rowz["company_name"] ?? '';
+	$xORDER = $rowz["job"] ?? '';
+	$TITLE = $rowz["job_name"] ?? '';		
+	$EMP = $rowz["candidate_name"] ?? '';
+  	// $REPORTTO = $row["Primary_Contact_Email"];
+  	// $REPORTTOCC = $row["Second_Contact_Email"];
+	
+
+require_once  dirname(__DIR__) . '/vendor/autoload.php';
+$client = new \GuzzleHttp\Client();
+
+echo "XXX".$PROJ."XXX";
+require_once  dirname(__DIR__) . '/db/token.php';
+$response = $client->request('GET', 'https://api.manatal.com/open/v3/jobs/'. $PROJ .'/', [
+  'headers' => [
+    'Authorization' => $token,
+    'accept' => 'application/json',
+  ],
+]);
+
+
+$response->getBody();
+
+	$responseStr = $response->getBody();
+	$job = json_decode($responseStr, true);
+	
+	$billingcycle = $job['custom_fields']['billingcycle'] ?? "";
+	$REPORTTO = $job['custom_fields']['timeapproveremail'] ?? "" ;
+	$REPORTTOCC  = $job['custom_fields']['timeapproveremail_b'] ?? "";
+	$job_name = $job['position_name'];
+	$invoice_cc_mail = $job['custom_fields']['apinvoiceemailcommadelimited'] ?? "";
+	$PO = $job['custom_fields']['ponumber'] ?? "";
+	
+	
+	
+IF ($strOK ) {
+
+	// Figure out who to email timesheet to:
+
+	
+	// echo( "<div style='padding-top:18px; padding-left:0px' class='formText'><font color='grey'>&nbsp;&nbsp;Assignment Number " . $row["xORDER"] . "</font></div><BR>" );
+
+
+	
+	// Conversion time 
+	function ampmTime($InTime) {
+
+	if ( Date('h', strtotime($InTime))  < 12) {
+	$OutHour = Date('h', strtotime(InTime));
+	$ampm = "am";
+	}
+	if ( Date('h', strtotime($InTime)) == 12 ) {
+	$OutHour = Date('h', strtotime($InTime));
+	$ampm = "PM";
+	}
+	if ( Date('h', strtotime($InTime)) > 12) {
+	$OutHour = Date('h', strtotime($InTime)) - 12;
+	$ampm = "PM";
+	}
+	$minutes = Date('m', strtotime($InTime));
+	IF (strLEN($minutes) < 2 ) {$minutes ="0" . $minutes;} 
+	IF (strLEN($OutHour) < 2 ) { $OutHour = "0" . $OutHour; }
+	$ampmTime = $OutHour . ":" . $minutes . $ampm;
+
+	return $ampmTime;
+	}
+
+	Function AmPmCompIn1($lsHr) { // need two because out should default to PM for new record
+	If ($lsHr >= 12) {
+			$AmPmCompIn1 = "PM";
+	} Else {
+			$AmPmCompIn1 = "AM";
+	}
+	return $AmPmCompIn1;
+	}
+
+
+	// php iif equivelent	 (condition ? true : false)
+	// function iff($cond,$istrue,$isfalse) {
+	// 	return(($cond == $istrue)?$istrue:$isfalse);
+	// }
+		
+	?>
+
+	
+	<form id ="webtime" action="manatal_save_mobile.php" method="post" onSubmit="return  validateFields()"> 
+	
+	<div class="lable_class"> Assignment Number: <?php echo  $xORDER ; ?></div>
+	
+	<div class="lable_class"> Contractor: <?php echo $EMP ; ?></div>
+	
+	<div class="lable_class"> Customer: <?php echo $JOB ; ?></div>
+	
+		<div class="lable_class"> Position: <?php echo $TITLE ; ?></div>
+		<!--
+	<div class="lable_class"> PO Number:</div>
+
+	<div class="lable_class"><input type='text' name='PoNumber' size='20' Value='<?php echo $row["PO"]; ?>' style="background-color:#edebeb;border:0px;" class="contact_input_class"></div>
+	-->
+	<div class="lable_class"> Week Ending: <?php echo $lsWeekEnd; ?></div>
+		
+	 <BR>
+
+	 <?php for ($i = 1; $i <= 7; $i++) { ?>
+<!-- start cut -->
+		<div class='outerboxT'>
+			<div style="float:left;width:77%;margin-top: 5px; margin-left:10px;"> 
+				<a onClick="pop('popDiv<?php echo $i; ?>')">
+				<h1 style="font-size: 22px;font-family:lato;color:#b22625;marging-left:10px;"><?php echo jddayofweek($i-2, 1); ?></h1>
+				</a>
+				<?php
+					IF ( HrComp($row["INHR" . $i]) <>"00" ) { ?>
+					<p style="font-size:11px;" >
+					<a style=" text-decoration:none;marging-left:10px;" onClick="pop('popDiv<?php echo $i; ?>')">	
+					<span id='divFrom<?php echo($i) ?>' >	From <?php echo ( HrComp1($row["INHR" . $i])) ?>:<?php	echo MinComp1($row["INHR" . $i]);?><?php echo (AmPmCompIn1($row["INHR" . $i])) ?></span> 
+					<span id='divTo<?php echo $i; ?>'>	To <?php	echo (HrComp1($row["OUTHR" . $i])) ?>:<?php	echo MinComp1($row["OUTHR" . $i]);?><?php echo (AmPmComp($row["OUTHR" . $i])) ;?></span>
+					<span id='divLunch<?php echo($i) ?>'>Lunch <?php echo (HrComp($row["BREAK"  . $i])); ?>:<?php echo MinComp1($row["BREAK" . $i]); ?> Hrs</span>
+	 				</a></p>
+				<?php } Else { ?>
+					<a style="font-size:11px; text-decoration:none;marging-left:10px;" onClick="pop('popDiv<?php echo($i) ;?>')">Click to enter daily timeframe</a>
+				<?php  } ?>
+			</div>
+			<div style="float:right;width:19%;margin-top:30px;"> <label  id="TotalDaily<?php echo $i; ?>"><?php echo( round($row["OUTHR" . $i] - $row["INHR" . $i] - $row["BREAK" . $i],2) ); ?>&nbsp;hrs</label>
+			</div>
+		</div>
+		<div id='popDiv<?php echo $i; ?>' class="ontop">
+			<div id="popup1">
+	  		<table>
+			<tr>
+				<td colspan="3">&nbsp;</td>
+			</tr> 
+
+			<tr>
+				<td style="text-align:center; color:#b22625;"> START</td>
+				<td style="text-align:center; color:#b22625;"> FINISH</td>
+				<td style="text-align:center; color:#b22625;"> BREAK</td>
+			</tr>
+			<tr>
+				<td style="padding-left:10px;"><input type="time"  id='TimeInHr<?php echo $i; ?>'  name='TimeInHr<?php echo $i; ?>' onchange='Converttimeformat(<?php echo $i; ?>);' placeholder="hrs:mins"  style="width:100px;" pattern="^([0-1]?[0-9]|2[0-4]):([0-5][0-9])(:[0-5][0-9])?$" Value='<?php echo DecToTime($row["INHR" . $i]);?>'/>
+				</td>			
+			
+				<td style= "padding-left:5px;" >
+					<input type="time" id='TimeOutHr<?php echo($i) ?>'  style="width:100px;" name="TimeOutHr<?php echo($i) ?>"  onchange='Converttimeformat(<?php echo $i; ?>);' placeholder="hrs:mins"  pattern="^([0-1]?[0-9]|2[0-4]):([0-5][0-9])(:[0-5][0-9])?$" value='<?php echo DecToTime($row["OUTHR" . $i]);?>'/>
+				</td>
+				<td style="padding-left:5px;" ><select id='BreakHr<?php echo($i) ?>'
+					onchange='Converttimeformat(<?php echo $i; ?>);' size="1" name="BreakHr<?php echo $i; ?>" style=" width: 60px;">
+
+					<?php
+
+					for ($Hours = 0; $Hours <= 23; $Hours++) {
+
+				  		For ($Mins=0 ; $Mins <= 45; $Mins+=15) { ?>
+					  		<option value="<?php echo str_pad($Hours,2,"0", STR_PAD_LEFT)?>:<?php echo str_pad($Mins,2,"0", STR_PAD_LEFT); ?>" 
+							<?php IF (DecToTime($row["BREAK" . $i]) ==  str_pad($Hours,2,"0", STR_PAD_LEFT) . ":" . str_pad($Mins,2,"0", STR_PAD_LEFT) ) { 
+					 			ECHO " selected" ;
+							} ?>>
+							<?php // echo HrComp($Hours). ":";?><?php // echo HrComp($Mins); ?>
+							<?php echo str_pad($Hours,2,"0", STR_PAD_LEFT)?>:<?php echo str_pad($Mins,2,"0", STR_PAD_LEFT); ?>
+							</option>
+
+					<?php }} ?>
+					</select>
+				</td>
+
+			</tr>
+			<tr>
+				<td  colspan="3">&nbsp;</td>
+			</tr>
+			<tr>
+
+				<td  colspan="3">
+
+					<div style="width:100%; text-align:center;"> 
+						<input type="button" style="width:31%;" class="Button1" name="btnCacel"  onClick="hide('popDiv<?php echo($i) ?>')"  value="Cancel"> &nbsp;		  
+						<input type="button" style="width:30%;" class="Button1" name="btnCacel"  onClick="hide('popDiv<?php echo($i) ?>')" value="OK">
+						&nbsp; 
+						<input style="width:31%;" type="button" class="Button1" name="btnClear"  onClick="retun:CLearText('<?php echo($i) ?>');"  value="Clear"> 
+		  			</div>
+				</td>
+			</tr>
+			</table>
+		</div>
+	</div>
+	<input type='hidden' name='TimeInAmPm<?php echo($i); ?>' value='<?php echo AmPmComp($row["INHR" . $i]);?> '>
+	<input type='hidden' name='TimeOutAmPm<?php echo($i); ?>' value='<?php echo AmPmComp($row["OUTHR" . $i]);?> '>
+	 <?php } ?>
+	
+	<?php
+	echo("<input type='hidden' name='EMP' value='" . $EMP. "'>") ;
+	echo("<input type='hidden' name='EMAIL' value='" . $_REQUEST['Email'] . "'>");
+	echo("<input type='hidden' name='DATE' value='" . $row["DATE"]. "'>") ;
+	echo("<input type='hidden' name='JOB' value='" . $JOB. "'>") ;
+	echo("<input type='hidden' name='ITEM' value='" . $TITLE. "'>") ;
+	echo("<input type='hidden' name='TITLE' value='" . $TITLE. "'>") ;
+	echo("<input type='hidden' name='NOTE' value='" . $row["NOTE"]. "'>") ;
+	echo("<input type='hidden' name='PROJ' value='" . $PROJ. "'>") ;
+	echo("<input type='hidden' name='xORDER' value='" . $xORDER . "'>") ;
+	echo("<input type='hidden' name='DURATION' value='" . $row["DURATION"]. "'>") ;
+	echo("<input type='hidden' name='BILLINGSTATUS' value='" . $row["BILLINGSTATUS"]. "'>") ;
+	echo("<input type='hidden' name='PITEM' value='" . $row["PITEM"]. "'>") ;
+	echo("<input type='hidden' name='BITEM' value='" . $row["BITEM"]. "'>") ;
+	echo("<input type='hidden' name='Contractor_ID' value='" . $Contractor_ID . "'>") ;
+	echo("<input type='hidden' name='BILLINGPROFILE' value='" . $row["BILLINGPROFILE"]. "'>") ;
+	echo("<input type='hidden' name='WKEND' value='" . $lsWeekEnd . "'>") ;
+	echo("<input type='hidden' name='billingcycle' value='" . $billingcycle . "'>") ;
+	?>
+	<input type="hidden" name="REPORTTO" value="<?php echo $REPORTTO; ?>">
+	<input type="hidden" name="REPORTTOCC" value="<?php echo $REPORTTOCC; ?>">
+	<?php
+	echo("<input type='hidden' name='BRANCH' value='" . $row["BRANCH"] . "'>") ;
+	echo("<input type='hidden' name='INVMETHOD' value='" . $row["INVMETHOD"] . "'>") ;
+	// echo("<input type='hidden' name='ALTETIME' value='" . $row["ALTETIME"] . "'>") ;
+	// echo("<input type='hidden' name='ALTETIME2' value='" . $row["ALTETIME2"] . "'>") ;
+	echo("<input type='hidden' name='ALTETIME' value='" . $ALTETIME . "'>") ;
+	echo("<input type='hidden' name='ALTEMPMAIL' value='" . $row["ALTEMPMAIL"] . "'>") ;
+	echo("<input type='hidden' name='AcctEmail' value='" . $invoice_cc_mail  . "'>") ;
+	echo("<input type='hidden' name='DIVISION' value='" . $row["DIVISION"]  . "'>") ;
+	echo("<input type='hidden' name='CONTRACT' value='" . $row["Contract"]  . "'>") ;
+	echo ("<input type='hidden' name='INVOICECC' value='" . $invoice_cc_mail . "'>");
+	echo("<input type='hidden' name='PO' value='" . $PO  . "'>") ;
+	echo ("<input type='hidden' name='PoNumber' value='" .$row["po_number"] . "'>");
+	
+	?>
+	&nbsp;		
+	
+			  <div class="lable_class" style="float:left; height:60px;"><img src="/webtime/css/star_img.png" alt="" />
+				This assignment is:
+					<?php IF ($lsNewWeb <> "True") { ?>
+						<?php IF ($row["CONT"] == "1") { ?>
+							<div class="lable_class" >
+								<input id="Assignment1" name="Continuing" type="radio"  value ="1" >Continuing&nbsp;
+							</div>
+							<div style="float:left;" class="lable_class" >
+								<input id="Assignment2" type="radio"  name="Continuing" value="0">Over<!--, this is my last timesheet for this job-->
+							</div>
+						<?php } Else { ?>
+							<div class="lable_class" >
+								<input id="Assignment1" name="Continuing" type="radio"  Value = "1">Continuing&nbsp;
+							</div>
+							<div style="float:left;" class="lable_class" >
+								<input id="Assignment2" type="radio"  name="Continuing" value="0" >Over<!--, this is my last timesheet for this job-->
+							</div>
+						<?php } ?>
+					</div>
+					<?php } ELSE { ?>
+						<div class="lable_class" >
+				  			<input id="Assignment1" name="Continuing" type="radio"  Value = "1" required>Continuing&nbsp;</font>
+						</div>
+				  		<div class="lable_class" >
+							<input id="Assignment2" type="radio"  name="Continuing" value="0" >Over<!--, this is my last timesheet for this job-->
+						</div>
+					<?php } ?>
+					
+			</div>
+			<br />
+			<!-- this is how the buttons should be -->
+			<div  class="center" style="height:40px;">
+			   <input type="submit" id="Next" onclick = "return window.parent.scroll(0,0);" name="Next" value="Next" class="Button" style="border:0px solid #fff;" >
+			</div>
+<!-- end cut -->	
+	<?php
+
+	} ELSE {
+		echo("You must check an assignment, please click the back button and try again");
+	
+	}
+	
+	?>		
+
+
+	</Form>
+		
+	<P>&nbsp;
+			
+	</p>
+	
+	</div>
+	</div>
+	<script language="javascript1.2">
+	
+	window.onload = function() {
+  	TotalDailyCal_All();
+	};
+</script>
+	</body>
+	</html>

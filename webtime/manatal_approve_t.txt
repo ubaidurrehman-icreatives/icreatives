@@ -1,0 +1,107 @@
+<?php
+$eScreen = "<!DOCTYPE html PUBLIC |-//W3C//DTD XHTML 1.0 Transitional//EN| |https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd|> ";
+$eScreen .= "<html>";
+$eScreen .= "<head>";
+$eScreen .= "<meta http-equiv=|Content-Type| content=|text/html; charset=utf-8| />";
+$eScreen .= "<title>i creatives</title>";
+$eScreen .= "</head>";
+$eScreen .= "<body>";
+
+/* ---- OUTER WRAPPER (610px, centered, no border-spacing) ---- */
+$eScreen .= "<table width=|610| align=|center| border=|0| cellpadding=|0| cellspacing=|0| style=|border-collapse:separate; border-spacing:0; border-radius:20px; border:3px solid #A50F14;|>";
+
+/* Row 1: Main content + 32px sidebar */
+$eScreen .= "<tr>";
+
+/* Main content cell with padding */
+$eScreen .= "<td valign=|top| style=|padding:15px;|>";
+
+/* ---- INNER CONTENT TABLE (570px) ---- */
+$eScreen .= "<table width=|570| border=|0| cellpadding=|4| cellspacing=|0| role=|presentation|>";
+
+$eScreen .= "<tr>";
+$eScreen .= "  <td width=|260| height=|170| align=|left| valign=|top|><img src=|https://port.icreatives.com/webtime/email/images/assets/logo.gif| width=|110| height=|123| border=|0| style=|margin:15px 0px| /></td>";
+$eScreen .= "  <td align=|right| valign=|top|>";
+$eScreen .= "    <h1 style=|font-family:Arial, Helvetica, sans-serif;color:#a4100c; margin:0; padding:2px; font-size:30px;|>TimeSheet</h1>";
+$eScreen .= "    <b>Week Ending:</b> " . date('m/d/Y', strtotime($WKEND));
+$eScreen .= "  </td>";
+$eScreen .= "</tr>";
+
+$eScreen .= "<tr>";
+$eScreen .= "  <td align=|left|><b style=|color:#a4100c|>Contractor: </b>XXXX</td>";
+$eScreen .= "  <td align=|right|></td>";
+$eScreen .= "</tr>";
+
+$eScreen .= "<tr><td height=|0| align=|left| valign=|top|></td><td></td></tr>";
+
+/* Timesheet grid */
+$eScreen .= "<tr><td colspan=|2| valign=|top|>";
+
+$eScreen .= "  <table width=|570| border=|0| cellpadding=|4| cellspacing=|0| role=|presentation|>";
+$eScreen .= "    <tr>";
+$eScreen .= "      <td width=|136| align=|left|><b>Day</b></td>";
+$eScreen .= "      <td width=|90| align=|left|><b>In</b></td>";
+$eScreen .= "      <td width=|90| align=|left|><b>Out</b></td>";
+$eScreen .= "      <td width=|90| align=|left|><b>Break</b></td>";
+$eScreen .= "      <td width=|42| align=|right|><b>Total</b></td>";
+$eScreen .= "    </tr>";
+$eScreen .= "    <tr><td colspan=|5| style=|border-top:solid 1px #ccc; height:5px;|></td></tr>";
+
+for ($x = 1; $x <= 7; $x++) {
+  $eScreen .= "  <tr>";
+  $eScreen .= "    <td align=|left|><b>" . jddayofweek($x-2,1) . "</b></td>";
+  $eScreen .= "    <td align=|right|><span style=|color:#666|>" . HrComp($row['INHR' . $x], $row['OUTHR' . $x]) . ":" . MinComp($row['INHR' . $x]) . " " . AmPmCompIn($row['INHR' . $x]) . "</span></td>";
+  $eScreen .= "    <td align=|right|><span style=|color:#666|>" . HrComp($row['OUTHR' . $x], 00) . ":" . MinComp($row['OUTHR' . $x]) . " " . AmPmCompIn($row['OUTHR' . $x]) . "</span></td>";
+  $eScreen .= "    <td align=|right|><span style=|color:#666|>" . HrComp($row['BREAK' . $x], 00) . ":" . MinComp($row['BREAK' . $x]) . "</span></td>";
+  $eScreen .= "    <td align=|right|><b>" . round(($row['OUTHR' . $x] - $row['INHR' . $x]) - $row['BREAK' . $x], 2) . "</b></td>";
+  $eScreen .= "  </tr>";
+}
+
+$eScreen .= "    <tr><td colspan=|5| style=|border-bottom:solid 1px #ccc; height:5px;|></td></tr>";
+$eScreen .= "    <tr>";
+$eScreen .= "      <td colspan=|2| align=|left|><b style=|color:#a4100c|>Assignment is: </b>" . (($row['CONT'] ?? '') === '1' ? 'Continuing' : 'Over') . "</td>";
+$eScreen .= "      <td colspan=|3| align=|right|><b style=|color:#a4100c|>Total: </b><b>" . $HOURS . "</b></td>";
+$eScreen .= "    </tr>";
+$eScreen .= "  </table>";
+
+$eScreen .= "</td></tr>";
+
+/* APPROVED and xORDER lines, still within 570px area */
+$eScreen .= "<tr><td colspan=|2| align=|left| valign=|bottom| height=|50|><h2 style=|font-size:14px; margin:0; padding:0;|>APPROVED</h2></td></tr>";
+$eScreen .= "<tr><td colspan=|2| align=|left| valign=|bottom| height=|20|><b>" . ($row['xORDER'] ?? '') . "</b></td></tr>";
+
+/* Close inner content table (570) */
+$eScreen .= "</table>";
+
+/* End main content cell */
+$eScreen .= "</td>";
+
+/* Sidebar 32px (empty or CTAs) */
+$eScreen .= "<td width=|32| valign=|top|>";
+$eScreen .= "  <!-- CTA1 -->";
+$eScreen .= "  <!-- CTA2 -->";
+$eScreen .= "  <!-- CTA3 -->";
+$eScreen .= "</td>";
+
+$eScreen .= "</tr>";
+
+/* Row 2: THANK-YOU BAR spanning BOTH columns so it aligns */
+$eScreen .= "<tr>";
+$eScreen .= "  <td colspan=|2| align=|center| style=|padding:0 15px 20px;|>";
+
+
+
+$eScreen .= "  </td>";
+$eScreen .= "</tr>";
+/* Close wrapper */
+$eScreen .= "</table>";
+$eScreen .= "<div style=|height:15px;|> </div>";
+$eScreen .= "    <table align=|center| width=|610| border=|0| cellpadding=|0| cellspacing=|0| role=|presentation| style=|margin:0 auto; border-collapse:collapse; color:#ffffff; background-color:#b22625; border-radius:20px; |>";
+$eScreen .= "      <tr>";
+$eScreen .= "        <td height=|50| align=|center| valign=|middle| style=|font-family:Arial, Helvetica, sans-serif; font-size:14px; line-height:20px; padding:12px 16px; text-align:center;|>";
+$eScreen .= "          Thank you for letting <i>icreatives</i> represent you.";
+$eScreen .= "        </td>";
+$eScreen .= "      </tr>";
+$eScreen .= "    </table>";
+$eScreen .= "</body></html>";
+?>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+
+<html>
+<!-- Required meta tags -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="../bootstrap-4.3.1-dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="styles.css">
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="../bootstrap-4.3.1-dist/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="//mozilla.github.io/pdf.js/build/pdf.js"></script>
+<style type="text/css">
+.post {
+  display:inline-block;
+  margin:10px;
+  padding:5px;
+}
+</style>
+<form>
+  <div class="container">
+    <div class="row">
+      <input class="candidate" type="hidden" name="candidateID[]">
+      <div class="col-sm-2">
+        <h5 id="1">Jane Doe</h5>
+        <a href="" target="_blank" id="1">Post Link</a><br>
+        <input type="hidden" name="include[]" value="no">
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" name="include[]" id="include" value="yes">
+          <label for="include" class="form-check-label">Include</label>
+        </div>
+      </div>
+      <div class="col-sm">
+        <p id="1">This is a sample comment</p>
+      </div>
+      <div class="col-sm">
+        <div class="file-group input-group mb-3">
+          <div class="custom-file">
+            <input class="resume form-control-file col-sm-10" type="file" name="resume[]" id="resume" accept=".pdf">
+            <label class="custom-file-label" for="resume">Choose resume</label>
+          </div>
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="button">X</button>
+          </div>
+        </div>
+        <input type="hidden" class="selected_order" id="selected_order" value="'.$order.'">
+      </div>
+    </div>
+  </div>
+</form>
+</html>

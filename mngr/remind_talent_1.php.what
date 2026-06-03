@@ -1,0 +1,62 @@
+<!-- #include file="CommonLogin.asp"-->
+
+<FORM Method = Post Action = "remindtalent3.php">
+
+<?php
+
+$link = mysqli_connect('localhost', 're0nm8', '50h8r6WNvB!ozVY2','ck3b2t') or die("Error: " . mysqli_error());
+
+
+
+	StrSQL = "SELECT EmpEmail , SentDate as PLZSEND From ic_webtime "
+	strSQL = strSQL & " where ic_webtime.weekending = '" & DATE() - weekday(date()+1) & "'"
+	
+' 	response.write(strsql)
+
+	rsOrder.Open strSQL, cn
+
+
+	IF rsOrder.EOF Then
+    	   response.write "<input type='checkbox' name='check" & I & "'>"
+	   response.write "Item "&I&" = " & myArray(I) & " " & NmArray(I) & "<br>" & vbCrLf
+ 	   IF request.form("MailList") = "Yes" then
+ 	      response.write("MAIL")
+	   END IF
+'		' response.write("EOF <BR>")
+	ELSE
+
+'		if talent saved timesheet but did not submit	
+ 	   IF NOT IsDate(rsOrder("PLZSEND")) then
+
+ '		response.write(x)
+   	   	response.write "<input type='checkbox' name='check" & I & "'>"
+	  	response.write "Item "&I&" = " & myArray(I) & " " & NmArray(I) & " (Saved)" & "<br>" & vbCrLf
+
+ 	   	IF request.form("MailList") = "Yes" then
+ 	      		response.write("MAIL")
+	   	END IF
+	   END IF
+
+	END IF
+
+	  rsOrder.Close
+
+
+next
+
+
+'--------------------------------------------
+?>
+<p>&nbsp;</p>
+<B><H3>Week Ending: <?php response.write(DATE() - weekday(date()+1)) ?></H3></B>
+<P>
+
+
+
+<p>&nbsp;</p>
+
+</FONT>
+
+<input type="Submit" value="Send List" name="Submit"> 
+<!-- #include file="global.asp"-->
+</Form>

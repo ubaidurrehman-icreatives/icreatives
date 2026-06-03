@@ -1,0 +1,197 @@
+<?php
+session_start();
+
+$order = isset($_POST['orderID']) ? $_POST['orderID'] : "";
+$client = isset($_POST['client']) ? $_POST['client'] === "1" : false;
+require_once "../random_compat/lib/random.php";
+$company_id = $_REQUEST['company_id'];
+$user = $_POST['user'];
+
+$link = mysqli_connect('localhost', 'TempBack', 'XE5Vx@54Pu1IRQXa','tempback') or die("Error: " . mysqli_error());
+
+
+// $mysqli = new mysqli("localhost","my_user","my_password","my_db");
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+use PHPMailer\PHPMailer\SMTP;
+
+
+// echo "useremail = ".$user;
+
+// check if it is a recruiter:
+
+$strSQL = "SELECT name from ic_sales where LOWER(name) = '". strtolower($user)."'";
+$result = mysqli_query($link,$strSQL);
+
+
+if (mysqli_num_rows($result) > 0) {
+	header("Location: /client-portal-login/?user=$user");
+	exit;
+}
+
+	if(!strpos($user,"@")) { // see if its an email address
+	// username not recognized
+		header("Location:/portals/?r=recognize".($order != "" ? "&orderID=$order" : ""));
+		exit;
+	}
+
+if(isset($_POST['user']) && $_POST['user'] != "" || isset($_SESSION['user'])) { // username entered (email/recruiter id)
+
+	$user = $_POST['user'];
+	// echo "user email = ".$user."<br>";
+	// Is user a Contact? let's check the ic_contacts sql table first
+	$query = "select * from ic_contacts where email = '". $user . "'";
+//	and icreativesportalaccess";
+	$result = mysqli_query($link,$query);
+	$is_contact = false;
+	while ($row = mysqli_fetch_array($result)) {
+		$is_contact = true;
+		$portal_name =$row['full_name'];
+		$company_name =$row['organization'];
+		$full_name = explode(" ",$row['full_name']);
+		$first_name=$full_name[0];
+		$contact_email = $user;
+		$contact_id = $row['id'];
+		$_SESSION['first_name'] = $first_name;
+	}
+
+		// now search the match records to see if it is an candidate
+		// To find the email address of a candidate, they must have  been or is on on an assignment before otherwise 
+		// we cannot find a candidate by email address alone so we store the email in the ic-matches database
+
+	$query = "select * from ic_matches where candidate_email = '". $user . "'";
+
+	$result = mysqli_query($link,$query);
+	$is_resource = false; // resource is a candidate
+	
+
+	while ($row = mysqli_fetch_array($result)) {
+		$is_resource = true;
+		// now ask manatal for 
+
+		$portal_name =$row['candidate_name'];
+		// $company_name =$peeps['firstRecord']['compaany']; // no need
+		$full_name = explode(" ",$portal_name);
+		$first_name=$full_name[0];
+		$contact_email = $user;
+		$_SESSION['first_name'] = $first_name;
+	}
+
+
+	$portal_name = $first_name;
+	$_SESSION['company_id'] = $company_id;
+
+
+	$_SESSION['company_name'] = $company_name;
+	$_SESSION['contactID'] = $contact_id;
+	$_SESSION['contact_email'] = $user;
+
+		$query = "SELECT * FROM ic_password_reset_tickets ic WHERE closed = 1 AND contact_email = '" . $user . "'";  
+		$result = mysqli_query($link,$query );		  	
+		echo $count = mysqli_num_rows($result); 
+		// echo "count = ".$count;
+		$been_there = false;
+
+		if($count > 0){
+			$been_there = true;
+		}		
+		
+	}
+
+	if(!$is_contact && !$is_resource) {
+
+		header("Location: /portals/?&r=recognize");
+	exit;}
+
+    if(!$client && $is_contact && $is_resource) {
+
+	header("Location:/choose-portal/?o=$order&user=$user&company_id=$company_id");
+      // header("Location:/choose-portal-account/?o=$order");
+	        // header("Location: /choose-portal-account/?o=".$order."&user=".$user);
+      exit;
+	
+    } else if(!$is_contact && $is_resource) {
+		
+      header("Location:/talent-portal/?user=".$user);
+	  // header("Location:/portal-talent-login/?user=".$user);
+      exit;
+    }
+	  else if ( $is_contact){
+
+		header("Location:/client-portal-login/?o=$order&user=$user");
+		// header("Location:/client-portal-authenticate/?o=$order&user=$user");
+        exit;
+	  }
+
+      // close previously created password tickets for contact
+        $query = "UPDATE ic_password_reset_tickets SET closed = 1, closed_at = '". date('Y-m-d H:i:s')."', close_reason = 'new ticket created' WHERE contact_id = " . $contact_id . " AND closed = 0";
+		$result = mysqli_query($link,$query );
+		// echo $query;
+		// exit();
+        // create new ticket
+		$hashed_token = hash('sha256',$token);
+		$hashed_token = bin2hex($token);
+		$new_date = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s'). ' + 3 hours'));
+        $query = "INSERT INTO ic_password_reset_tickets (contact_id, selector, token, created_at, expires_at,contact_email) VALUES ('".$contact_id."','".$selector."','".$hashed_token ."','".date('Y-m-d H:i:s')."','".$new_date."','".$user."')";
+		// echo $query; 
+		$result = mysqli_query($link,$query );
+		// exit();
+
+        // build url with selector and validator
+        $portal_url = sprintf('%s/create-portal-password/?%s', "https://".$_SERVER['SERVER_NAME'], http_build_query([
+          'selector' => $selector,
+          'validator' => bin2hex($token)
+        ]));
+		$_SESSION['portal_url'] = $portal_url;
+		// echo "<br>portal url = ".$_SESSION['portal_url'];
+		
+		// check if username is an email associated  with a contact
+
+		// Save Client Email to History
+		if(!is_null($contact_id)) {
+
+      		$firstName = $firstname;
+      		$lastName = $lastname;
+      		$divisionID = "";
+      		$customerID = $company_id;
+      		$contactID = $contact_id;
+		    $contact_email = $email; 
+			
+
+				echo "<br>First Name: ".$firstname;
+				echo "<br>Last Name: ".$lastname;
+				echo "<br>email: ".$email;
+				echo "<br>PW: ".$password;
+
+			// more add history stuff here by SJC 05/26/2020
+          	$txt_message = "
+
+		We received a request to create an account to your portal. To continue, you will need to make a password. The link to create your password is below.
+
+		If you did not make this request, you can ignore this email
+
+		Here is your password creation link:
+
+		". $portal_url. "	";
+		
+	
+		/*		
+
+     		$query = "EXEC HISTORY_INSERT @EventCode = 'PSR', @EventMethod = NULL, @Comment = '".addslashes($txt_message)."', @CustomerKey = '" . $customerID . "', @DivisionKey = '" . $divisionID . "', @ContactKey = '" . $contactID . "'";
+      		odbc_exec($conn, $query);
+			}
+			// done adding history
+		*/
+	  }
+		// find company owner email address
+
+        // take to new-user
+        header("Location:/new-portal-user/?user=$user&company_id=$company_id");
+
+	// } // remove later
+// username not recognized
+header("Location:/portal-login/?r=recognize".($order != "" ? "&orderID=$order" : ""));
+exit;
+
+?>
