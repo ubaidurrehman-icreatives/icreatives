@@ -140,17 +140,21 @@ Function SaveVal() {
     $OutMin   = (int)$OutMin;
     $BreakHr  = (int)$BreakHr;
     $BreakMin = (int)$BreakMin;
+        $InAmPm   = ($InHr >= 12) ? "PM" : "AM";
+        $OutAmPm  = ($OutHr >= 12) ? "PM" : "AM";
 
     // ----------------------------------
     // Output exactly what NEXT program expects:
     // ----------------------------------
     echo "<input type='hidden' name='TimeInHr{$i}' value='{$InHr}'>" . PHP_EOL;
     echo "<input type='hidden' name='TimeInMin{$i}' value='{$InMin}'>" . PHP_EOL;
+        echo "<input type='hidden' name='TimeInAmPm{$i}' value='{$InAmPm}'>" . PHP_EOL;
 
-    echo "<input type='hidden' name='TimeOutHr{$i}' value='{$OutHr}'>" . PHP_EOL;
+        echo "<input type='hidden' name='TimeOutHr{$i}' value='{$OutHr}'>" . PHP_EOL;
     echo "<input type='hidden' name='TimeOutMin{$i}' value='{$OutMin}'>" . PHP_EOL;
+        echo "<input type='hidden' name='TimeOutAmPm{$i}' value='{$OutAmPm}'>" . PHP_EOL;
 
-    echo "<input type='hidden' name='BreakHr{$i}' value='{$BreakHr}'>" . PHP_EOL;
+        echo "<input type='hidden' name='BreakHr{$i}' value='{$BreakHr}'>" . PHP_EOL;
     echo "<input type='hidden' name='BreakMin{$i}' value='{$BreakMin}'>" . PHP_EOL;
 }
 
